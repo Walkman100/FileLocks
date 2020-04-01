@@ -296,7 +296,10 @@ namespace NTQuery
                 for (int i = 0; i < handleCount; i++)
                 {
                     var struc = (SystemHandleEntry)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SystemHandleEntry));
-                    yield return new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
+
+                    // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
+                    if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
+                        yield return new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
                     offset += size;
                 }
             }
