@@ -207,7 +207,7 @@ namespace GetOpenHandles
             }
         }
 
-        private sealed class OpenFiles : IEnumerable<String>
+        private sealed class OpenFiles : IEnumerable<string>
         {
             private readonly int processId;
 
@@ -216,12 +216,11 @@ namespace GetOpenHandles
                 this.processId = processId;
             }
 
-            public IEnumerator<String> GetEnumerator()
+            public IEnumerator<string> GetEnumerator()
             {
                 NT_STATUS ret;
                 int length = 0x10000;
                 // Loop, probing for required memory.
-
 
                 do
                 {
@@ -244,7 +243,7 @@ namespace GetOpenHandles
                         if (ret == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
                         {
                             // Round required memory up to the nearest 64KB boundary.
-                            length = ((returnLength + 0xffff) & ~0xffff);
+                            length = (returnLength + 0xffff) & ~0xffff;
                         }
                         else if (ret == NT_STATUS.STATUS_SUCCESS)
                         {
@@ -268,13 +267,9 @@ namespace GetOpenHandles
                                             if (ConvertDevicePathToDosPath(devicePath, out dosPath))
                                             {
                                                 if (File.Exists(dosPath))
-                                                {
                                                     yield return dosPath; // return new FileInfo(dosPath);
-                                                }
                                                 else if (Directory.Exists(dosPath))
-                                                {
                                                     yield return dosPath; // new DirectoryInfo(dosPath);
-                                                }
                                             }
                                         }
                                     }
@@ -304,47 +299,14 @@ namespace GetOpenHandles
         private class FileNameFromHandleState : IDisposable
         {
             private ManualResetEvent _mr;
-            private IntPtr _handle;
-            private string _fileName;
-            private bool _retValue;
-
-            public IntPtr Handle
-            {
-                get
-                {
-                    return _handle;
-                }
-            }
-
-            public string FileName
-            {
-                get
-                {
-                    return _fileName;
-                }
-                set
-                {
-                    _fileName = value;
-                }
-
-            }
-
-            public bool RetValue
-            {
-                get
-                {
-                    return _retValue;
-                }
-                set
-                {
-                    _retValue = value;
-                }
-            }
+            public IntPtr Handle { get; }
+            public string FileName { get; set; }
+            public bool RetValue { get; set; }
 
             public FileNameFromHandleState(IntPtr handle)
             {
                 _mr = new ManualResetEvent(false);
-                this._handle = handle;
+                this.Handle = handle;
             }
 
             public bool WaitOne(int wait)
@@ -417,7 +379,6 @@ namespace GetOpenHandles
             fileName = string.Empty;
             return false;
         }
-
         private static void GetFileNameFromHandle(object state)
         {
             FileNameFromHandleState s = (FileNameFromHandleState)state;
@@ -443,11 +404,10 @@ namespace GetOpenHandles
                 }
             }
         }
-
         private static bool GetFileNameFromHandle(IntPtr handle, int processId, out string fileName)
         {
             IntPtr currentProcess = GetCurrentProcess();
-            bool remote = (processId != GetProcessId(currentProcess));
+            bool remote = processId != GetProcessId(currentProcess);
             SafeProcessHandle processHandle = null;
             SafeObjectHandle objectHandle = null;
             try
@@ -456,9 +416,7 @@ namespace GetOpenHandles
                 {
                     processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
                     if (DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
-                    {
                         handle = objectHandle.DangerousGetHandle();
-                    }
                 }
                 return GetFileNameFromHandle(handle, out fileName, 200);
             }
@@ -467,73 +425,9 @@ namespace GetOpenHandles
                 if (remote)
                 {
                     if (processHandle != null)
-                    {
                         processHandle.Close();
-                    }
                     if (objectHandle != null)
-                    {
                         objectHandle.Close();
-                    }
-                }
-            }
-        }
-
-        private static bool GetHandleType(IntPtr handle, int processId, out SystemHandleType handleType)
-        {
-            string token = GetHandleTypeToken(handle, processId);
-            return GetHandleTypeFromToken(token, out handleType);
-        }
-
-        private static bool GetHandleType(IntPtr handle, out SystemHandleType handleType)
-        {
-            string token = GetHandleTypeToken(handle);
-            return GetHandleTypeFromToken(token, out handleType);
-        }
-
-        private static bool GetHandleTypeFromToken(string token, out SystemHandleType handleType)
-        {
-            for (int i = 1; i < handleTypeTokenCount; i++)
-            {
-                if (handleTypeTokens[i] == token)
-                {
-                    handleType = (SystemHandleType)i;
-                    return true;
-                }
-            }
-            handleType = SystemHandleType.OB_TYPE_UNKNOWN;
-            return false;
-        }
-
-        private static string GetHandleTypeToken(IntPtr handle, int processId)
-        {
-            IntPtr currentProcess = GetCurrentProcess();
-            bool remote = (processId != GetProcessId(currentProcess));
-            SafeProcessHandle processHandle = null;
-            SafeObjectHandle objectHandle = null;
-            try
-            {
-                if (remote)
-                {
-                    processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
-                    if (DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
-                    {
-                        handle = objectHandle.DangerousGetHandle();
-                    }
-                }
-                return GetHandleTypeToken(handle);
-            }
-            finally
-            {
-                if (remote)
-                {
-                    if (processHandle != null)
-                    {
-                        processHandle.Close();
-                    }
-                    if (objectHandle != null)
-                    {
-                        objectHandle.Close();
-                    }
                 }
             }
         }
@@ -565,6 +459,62 @@ namespace GetOpenHandles
             }
             return string.Empty;
         }
+        private static string GetHandleTypeToken(IntPtr handle, int processId)
+        {
+            IntPtr currentProcess = GetCurrentProcess();
+            bool remote = processId != GetProcessId(currentProcess);
+            SafeProcessHandle processHandle = null;
+            SafeObjectHandle objectHandle = null;
+            try
+            {
+                if (remote)
+                {
+                    processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
+                    if (DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
+                    {
+                        handle = objectHandle.DangerousGetHandle();
+                    }
+                }
+                return GetHandleTypeToken(handle);
+            }
+            finally
+            {
+                if (remote)
+                {
+                    if (processHandle != null)
+                    {
+                        processHandle.Close();
+                    }
+                    if (objectHandle != null)
+                    {
+                        objectHandle.Close();
+                    }
+                }
+            }
+        }
+        private static bool GetHandleTypeFromToken(string token, out SystemHandleType handleType)
+        {
+            for (int i = 1; i < handleTypeTokenCount; i++)
+            {
+                if (handleTypeTokens[i] == token)
+                {
+                    handleType = (SystemHandleType)i;
+                    return true;
+                }
+            }
+            handleType = SystemHandleType.OB_TYPE_UNKNOWN;
+            return false;
+        }
+        private static bool GetHandleType(IntPtr handle, out SystemHandleType handleType)
+        {
+            string token = GetHandleTypeToken(handle);
+            return GetHandleTypeFromToken(token, out handleType);
+        }
+        private static bool GetHandleType(IntPtr handle, int processId, out SystemHandleType handleType)
+        {
+            string token = GetHandleTypeToken(handle, processId);
+            return GetHandleTypeFromToken(token, out handleType);
+        }
 
         private static bool ConvertDevicePathToDosPath(string devicePath, out string dosPath)
         {
@@ -588,7 +538,7 @@ namespace GetOpenHandles
             if (deviceMap == null)
             {
                 Dictionary<string, string> localDeviceMap = BuildDeviceMap();
-                Interlocked.CompareExchange<Dictionary<string, string>>(ref deviceMap, localDeviceMap, null);
+                Interlocked.CompareExchange(ref deviceMap, localDeviceMap, null);
             }
         }
 
@@ -622,7 +572,7 @@ namespace GetOpenHandles
         /// </summary>
         /// <param name="processId">The process id.</param>
         /// <returns></returns>
-        public static IEnumerable<String> GetOpenFilesEnumerator(int processId)
+        public static IEnumerable<string> GetOpenFilesEnumerator(int processId)
         {
             return new OpenFiles(processId);
         }
@@ -630,11 +580,11 @@ namespace GetOpenHandles
         public static List<Process> GetProcessesUsingFile(string fName)
         {
             List<Process> result = new List<Process>();
-            foreach (var p in Process.GetProcesses())
+            foreach (Process p in Process.GetProcesses())
             {
                 try
                 {
-                    if (DetectOpenFiles.GetOpenFilesEnumerator(p.Id).Contains(fName))
+                    if (GetOpenFilesEnumerator(p.Id).Contains(fName))
                     {
                         result.Add(p);
                     }
