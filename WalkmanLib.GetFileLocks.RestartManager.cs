@@ -17,18 +17,39 @@ namespace WalkmanLib.GetFileLocks
 {
     public static class RestartManager
     {
-        [StructLayout(LayoutKind.Sequential)]
-        struct RM_UNIQUE_PROCESS
-        {
-            public int dwProcessId;
-            public System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
-        }
-
-        const int RmRebootReasonNone = 0;
         const int CCH_RM_MAX_APP_NAME = 255;
         const int CCH_RM_MAX_SVC_NAME = 63;
+        const int ERROR_MORE_DATA = 234;
 
-        enum RM_APP_TYPE
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_process_info
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct RM_PROCESS_INFO
+        {
+            public RM_UNIQUE_PROCESS Process;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
+            public string AppName;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
+            public string ServiceShortName;
+
+            public RM_APP_TYPE ApplicationType;
+            public uint AppStatus;
+            public uint TSSessionId;
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool Restartable;
+        }
+
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_unique_process
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RM_UNIQUE_PROCESS
+        {
+            public uint dwProcessId;
+            System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
+        }
+
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ne-restartmanager-rm_app_type
+        public enum RM_APP_TYPE
         {
             RmUnknownApp = 0,
             RmMainWindow = 1,
@@ -39,25 +60,8 @@ namespace WalkmanLib.GetFileLocks
             RmCritical = 1000
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        struct RM_PROCESS_INFO
-        {
-            public RM_UNIQUE_PROCESS Process;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
-            public string strAppName;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
-            public string strServiceShortName;
-
-            public RM_APP_TYPE ApplicationType;
-            public uint AppStatus;
-            public uint TSSessionId;
-            [MarshalAs(UnmanagedType.Bool)]
-            public bool bRestartable;
-        }
-
-        [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmregisterresources
+        [DllImport("rstrtmgr.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         static extern int RmRegisterResources(uint pSessionHandle,
                                               uint nFiles,
                                               string[] rgsFilenames,
@@ -66,15 +70,18 @@ namespace WalkmanLib.GetFileLocks
                                               uint nServices,
                                               string[] rgsServiceNames);
 
-        [DllImport("rstrtmgr.dll", CharSet = CharSet.Auto)]
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmstartsession
+        [DllImport("rstrtmgr.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int RmStartSession(out uint pSessionHandle,
                                          int dwSessionFlags,
                                          string strSessionKey);
 
-        [DllImport("rstrtmgr.dll")]
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmendsession
+        [DllImport("rstrtmgr.dll", SetLastError = true)]
         static extern int RmEndSession(uint pSessionHandle);
 
-        [DllImport("rstrtmgr.dll")]
+        //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetlist
+        [DllImport("rstrtmgr.dll", SetLastError = true)]
         static extern int RmGetList(uint dwSessionHandle,
                                     out uint pnProcInfoNeeded,
                                     ref uint pnProcInfo,
@@ -106,7 +113,7 @@ namespace WalkmanLib.GetFileLocks
                 const int ERROR_MORE_DATA = 234;
                 uint pnProcInfoNeeded = 0,
                      pnProcInfo = 0,
-                     lpdwRebootReasons = RmRebootReasonNone;
+                     lpdwRebootReasons = 0; //RmRebootReasonNone;
 
                 string[] resources = { path }; // Just checking on one resource.
 
@@ -138,7 +145,7 @@ namespace WalkmanLib.GetFileLocks
                         {
                             try
                             {
-                                processes.Add(Process.GetProcessById(processInfo[i].Process.dwProcessId));
+                                processes.Add(Process.GetProcessById((int)processInfo[i].Process.dwProcessId));
                             }
                             // catch the error -- in case the process is no longer running
                             catch (ArgumentException) { }
