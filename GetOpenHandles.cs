@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-//using System.EnterpriseServices;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
@@ -369,57 +368,6 @@ namespace GetOpenHandles
             }
         }
 
-        private static bool GetFileNameFromHandle(IntPtr handle, int processId, out string fileName)
-        {
-            IntPtr currentProcess = GetCurrentProcess();
-            bool remote = (processId != GetProcessId(currentProcess));
-            SafeProcessHandle processHandle = null;
-            SafeObjectHandle objectHandle = null;
-            try
-            {
-                if (remote)
-                {
-                    processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
-                    if (DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
-                    {
-                        handle = objectHandle.DangerousGetHandle();
-                    }
-                }
-                return GetFileNameFromHandle(handle, out fileName, 200);
-            }
-            finally
-            {
-                if (remote)
-                {
-                    if (processHandle != null)
-                    {
-                        processHandle.Close();
-                    }
-                    if (objectHandle != null)
-                    {
-                        objectHandle.Close();
-                    }
-                }
-            }
-        }
-        private static bool GetFileNameFromHandle(IntPtr handle, out string fileName, int wait)
-        {
-            using (FileNameFromHandleState f = new FileNameFromHandleState(handle))
-            {
-                ThreadPool.QueueUserWorkItem(new WaitCallback(GetFileNameFromHandle), f);
-                if (f.WaitOne(wait))
-                {
-                    fileName = f.FileName;
-                    return f.RetValue;
-                }
-                else
-                {
-                    fileName = string.Empty;
-                    return false;
-                }
-            }
-        }
-
         private static bool GetFileNameFromHandle(IntPtr handle, out string fileName)
         {
             IntPtr ptr = IntPtr.Zero;
@@ -477,6 +425,57 @@ namespace GetOpenHandles
             s.RetValue = GetFileNameFromHandle(s.Handle, out fileName);
             s.FileName = fileName;
             s.Set();
+        }
+        private static bool GetFileNameFromHandle(IntPtr handle, out string fileName, int wait)
+        {
+            using (FileNameFromHandleState f = new FileNameFromHandleState(handle))
+            {
+                ThreadPool.QueueUserWorkItem(new WaitCallback(GetFileNameFromHandle), f);
+                if (f.WaitOne(wait))
+                {
+                    fileName = f.FileName;
+                    return f.RetValue;
+                }
+                else
+                {
+                    fileName = string.Empty;
+                    return false;
+                }
+            }
+        }
+
+        private static bool GetFileNameFromHandle(IntPtr handle, int processId, out string fileName)
+        {
+            IntPtr currentProcess = GetCurrentProcess();
+            bool remote = (processId != GetProcessId(currentProcess));
+            SafeProcessHandle processHandle = null;
+            SafeObjectHandle objectHandle = null;
+            try
+            {
+                if (remote)
+                {
+                    processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
+                    if (DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
+                    {
+                        handle = objectHandle.DangerousGetHandle();
+                    }
+                }
+                return GetFileNameFromHandle(handle, out fileName, 200);
+            }
+            finally
+            {
+                if (remote)
+                {
+                    if (processHandle != null)
+                    {
+                        processHandle.Close();
+                    }
+                    if (objectHandle != null)
+                    {
+                        objectHandle.Close();
+                    }
+                }
+            }
         }
 
         private static bool GetHandleType(IntPtr handle, int processId, out SystemHandleType handleType)
@@ -552,7 +551,8 @@ namespace GetOpenHandles
                 { }
                 finally
                 {
-                    ptr = Marshal.AllocHGlobal(length);
+                    if (length >= 0)
+                        ptr = Marshal.AllocHGlobal(length);
                 }
                 if (NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) == NT_STATUS.STATUS_SUCCESS)
                 {
@@ -616,7 +616,7 @@ namespace GetOpenHandles
             }
             return deviceName;
         }
-        
+
         /// <summary>
         /// Gets the open files enumerator.
         /// </summary>
