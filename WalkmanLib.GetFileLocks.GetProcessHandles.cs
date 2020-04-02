@@ -1,4 +1,6 @@
+// Get a process's open handles method - uses NTQuerySystemInformation and NTQueryObject
 //https://stackoverflow.com/a/6351168/2999220
+
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ using System.Linq;
 
 namespace WalkmanLib.GetFileLocks
 {
-    public static class GetOpenHandles
+    public static class GetProcessHandles
     {
         private static Dictionary<string, string> deviceMap;
         private const string networkDevicePrefix = "\\Device\\LanmanRedirector\\";

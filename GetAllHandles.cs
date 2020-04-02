@@ -1,13 +1,14 @@
+// Get all system open handles method - uses NTQuerySystemInformation and NTQueryObject
 //https://gist.github.com/i-e-b/2290426
 //https://stackoverflow.com/a/13735033/2999220
 
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
-namespace NTQuery
+namespace GetAllHandles
 {
     public static class HandleUtil
     {

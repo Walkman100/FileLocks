@@ -1,4 +1,6 @@
+// Get a process's open handles method - uses NTQuerySystemInformation and NTQueryObject
 //https://stackoverflow.com/a/6351168/2999220
+
 
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ using Microsoft.Win32.SafeHandles;
 using System.Diagnostics;
 using System.Linq;
 
-namespace GetOpenHandles
+namespace GetProcessHandles
 {
     public static class DetectOpenFiles
     {

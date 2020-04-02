@@ -1,5 +1,7 @@
+// Get all system open handles method - uses NTQuerySystemInformation and NTQueryObject
 //https://gist.github.com/i-e-b/2290426
 //https://stackoverflow.com/a/13735033/2999220
+
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace WalkmanLib.GetFileLocks
 {
-    public static class NTQuery
+    public static class GetAllHandles
     {
         public enum HandleType
         {
