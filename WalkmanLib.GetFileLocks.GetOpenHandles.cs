@@ -585,14 +585,11 @@ namespace WalkmanLib.GetFileLocks
                 try
                 {
                     if (GetOpenFilesEnumerator(p.Id).Contains(fName))
-                    {
                         result.Add(p);
-                    }
                 }
                 catch { }//some processes will fail
             }
             return result;
         }
-
     }
 }

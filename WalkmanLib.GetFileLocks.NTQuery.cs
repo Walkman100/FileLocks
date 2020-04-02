@@ -138,7 +138,7 @@ namespace WalkmanLib.GetFileLocks
                     initTypeAndName();
             }
 
-            bool _typeAndNameAttempted = false;
+            private bool _typeAndNameAttempted = false;
 
             private void initTypeAndName()
             {
@@ -170,7 +170,7 @@ namespace WalkmanLib.GetFileLocks
                             ptr = Marshal.AllocHGlobal(length);
                             if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) != NT_STATUS.STATUS_SUCCESS)
                                 return;
-                            _typeStr = Marshal.PtrToStringUni((IntPtr)((int)ptr + 0x58 + 2 * IntPtr.Size));
+                            _typeStr = Marshal.PtrToStringUni((IntPtr)((int)ptr + 0x58 + (2 * IntPtr.Size)));
                             _rawTypeMap[RawType] = _typeStr;
                         }
                         finally
@@ -191,7 +191,7 @@ namespace WalkmanLib.GetFileLocks
                             ptr = Marshal.AllocHGlobal(length);
                             if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length) != NT_STATUS.STATUS_SUCCESS)
                                 return;
-                            _name = Marshal.PtrToStringUni((IntPtr)((int)ptr + 2 * IntPtr.Size));
+                            _name = Marshal.PtrToStringUni((IntPtr)((int)ptr + (2 * IntPtr.Size)));
                         }
                         finally
                         {
@@ -276,7 +276,7 @@ namespace WalkmanLib.GetFileLocks
                 {
                     ptr = Marshal.AllocHGlobal(length);
                     int wantedLength;
-                    var result = NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, out wantedLength);
+                    NT_STATUS result = NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, out wantedLength);
                     if (result == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
                     {
                         length = Math.Max(length, wantedLength);
@@ -286,7 +286,7 @@ namespace WalkmanLib.GetFileLocks
                     else if (result == NT_STATUS.STATUS_SUCCESS)
                         break;
                     else
-                        throw new Exception("Failed to retrieve system handle information.");
+                        throw new Exception("Failed to retrieve system handle information.", new System.ComponentModel.Win32Exception());
                 }
 
                 int handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : (int)Marshal.ReadInt64(ptr);
@@ -294,7 +294,7 @@ namespace WalkmanLib.GetFileLocks
                 int size = Marshal.SizeOf(typeof(SystemHandleEntry));
                 for (int i = 0; i < handleCount; i++)
                 {
-                    var struc = (SystemHandleEntry)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SystemHandleEntry));
+                    SystemHandleEntry struc = (SystemHandleEntry)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SystemHandleEntry));
 
                     // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
                     if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
