@@ -23,9 +23,9 @@ namespace WalkmanLib.GetFileLocks
 
         //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_process_info
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct RM_PROCESS_INFO
+        public struct ProcessInfo
         {
-            public RM_UNIQUE_PROCESS Process;
+            public UniqueProcess Process;
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
             public string AppName;
@@ -33,7 +33,7 @@ namespace WalkmanLib.GetFileLocks
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
             public string ServiceShortName;
 
-            public RM_APP_TYPE ApplicationType;
+            public AppType ApplicationType;
             public uint AppStatus;
             public uint TSSessionId;
             [MarshalAs(UnmanagedType.Bool)]
@@ -42,14 +42,14 @@ namespace WalkmanLib.GetFileLocks
 
         //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_unique_process
         [StructLayout(LayoutKind.Sequential)]
-        public struct RM_UNIQUE_PROCESS
+        public struct UniqueProcess
         {
-            public uint dwProcessId;
+            public uint ProcessID;
             System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ne-restartmanager-rm_app_type
-        public enum RM_APP_TYPE
+        public enum AppType
         {
             RmUnknownApp = 0,
             RmMainWindow = 1,
@@ -66,7 +66,7 @@ namespace WalkmanLib.GetFileLocks
                                               uint nFiles,
                                               string[] rgsFilenames,
                                               uint nApplications,
-                                              [In] RM_UNIQUE_PROCESS[] rgApplications,
+                                              [In] UniqueProcess[] rgApplications,
                                               uint nServices,
                                               string[] rgsServiceNames);
 
@@ -85,83 +85,64 @@ namespace WalkmanLib.GetFileLocks
         static extern int RmGetList(uint dwSessionHandle,
                                     out uint pnProcInfoNeeded,
                                     ref uint pnProcInfo,
-                                    [In, Out] RM_PROCESS_INFO[] rgAffectedApps,
+                                    [In, Out] ProcessInfo[] rgAffectedApps,
                                     ref uint lpdwRebootReasons);
 
-        /// <summary>
-        /// Find out what process(es) have a lock on the specified file.
-        /// </summary>
-        /// <param name="path">Path of the file.</param>
-        /// <returns>Processes locking the file</returns>
-        /// <remarks>See also:
-        /// http://msdn.microsoft.com/en-us/library/windows/desktop/aa373661(v=vs.85).aspx
-        /// http://wyupdate.googlecode.com/svn-history/r401/trunk/frmFilesInUse.cs (no copyright in code at time of viewing)
-        /// </remarks>
-        public static List<Process> GetProcessesLockingFile(string path)
+        public static ProcessInfo[] GetProcessInfos(string path)
         {
             uint handle;
-            string key = Guid.NewGuid().ToString();
-            List<Process> processes = new List<Process>();
-
-            int res = RmStartSession(out handle, 0, key);
-
-            if (res != 0)
-                throw new Exception("Could not begin restart session.  Unable to determine file locker.");
+            if (RmStartSession(out handle, 0, Guid.NewGuid().ToString()) != 0)
+                throw new Exception("Could not begin session. Unable to determine file lockers.", new Win32Exception());
 
             try
             {
-                const int ERROR_MORE_DATA = 234;
-                uint pnProcInfoNeeded = 0,
-                     pnProcInfo = 0,
+                uint ArrayLengthNeeded = 0,
+                     ArrayLength = 0,
                      lpdwRebootReasons = 0; //RmRebootReasonNone;
 
                 string[] resources = { path }; // Just checking on one resource.
 
-                res = RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
+                if (RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null) != 0)
+                    throw new Exception("Could not register resource.", new Win32Exception());
 
-                if (res != 0)
-                    throw new Exception("Could not register resource.");
-
-                //Note: there's a race condition here -- the first call to RmGetList() returns
-                //      the total number of process. However, when we call RmGetList() again to get
-                //      the actual processes this number may have increased.
-                res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
-
-                if (res == ERROR_MORE_DATA)
+                switch (RmGetList(handle, out ArrayLengthNeeded, ref ArrayLength, null, ref lpdwRebootReasons))
                 {
-                    // Create an array to store the process results
-                    RM_PROCESS_INFO[] processInfo = new RM_PROCESS_INFO[pnProcInfoNeeded];
-                    pnProcInfo = pnProcInfoNeeded;
+                    case ERROR_MORE_DATA:
+                        ProcessInfo[] processInfos = new ProcessInfo[ArrayLengthNeeded];
+                        ArrayLength = ArrayLengthNeeded;
 
-                    // Get the list
-                    res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
-                    if (res == 0)
-                    {
-                        processes = new List<Process>((int)pnProcInfo);
+                        if (RmGetList(handle, out ArrayLengthNeeded, ref ArrayLength, processInfos, ref lpdwRebootReasons) != 0)
+                            throw new Exception("Could not list processes locking resource.", new Win32Exception());
 
-                        // Enumerate all of the results and add them to the 
-                        // list to be returned
-                        for (int i = 0; i < pnProcInfo; i++)
-                        {
-                            try
-                            {
-                                processes.Add(Process.GetProcessById((int)processInfo[i].Process.dwProcessId));
-                            }
-                            // catch the error -- in case the process is no longer running
-                            catch (ArgumentException) { }
-                        }
-                    }
-                    else
-                        throw new Exception("Could not list processes locking resource.");
+                        return processInfos;
+                    case 0:
+                        return new ProcessInfo[0];
+                    default:
+                        throw new Exception("Could not list processes locking resource. Failed to get size of result.", new Win32Exception());
                 }
-                else if (res != 0)
-                    throw new Exception("Could not list processes locking resource. Failed to get size of result.");
             }
             finally
             {
                 RmEndSession(handle);
             }
+        }
 
+        public static List<Process> GetProcesses(string path)
+        {
+            ProcessInfo[] processInfos = GetProcessInfos(path);
+
+            List<Process> processes = new List<Process>(processInfos.Length);
+            // Enumerate all of the results and add them to the list to be returned
+            for (int i = 0; i < processInfos.Length; i++)
+            {
+                try
+                {
+                    Process process = Process.GetProcessById((int)processInfos[i].Process.ProcessID);
+                    processes.Add(process);
+                }
+                // in case the process is no longer running
+                catch (ArgumentException) { }
+            }
             return processes;
         }
     }
