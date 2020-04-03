@@ -574,24 +574,24 @@ namespace WalkmanLib.GetFileLocks
         /// </summary>
         /// <param name="processId">The process id.</param>
         /// <returns></returns>
-        public static IEnumerable<string> GetOpenFilesEnumerator(int processId)
+        public static IEnumerable<string> GetProcessOpenFiles(int processId)
         {
             return new OpenFiles(processId);
         }
 
-        public static List<Process> GetProcessesUsingFile(string fName)
+        public static List<Process> GetLockingProcesses(string path)
         {
-            List<Process> result = new List<Process>();
+            List<Process> processes = new List<Process>();
             foreach (Process p in Process.GetProcesses())
             {
                 try
                 {
-                    if (GetOpenFilesEnumerator(p.Id).Contains(fName))
-                        result.Add(p);
+                    if (GetProcessOpenFiles(p.Id).Contains(path))
+                        processes.Add(p);
                 }
                 catch { }//some processes will fail
             }
-            return result;
+            return processes;
         }
     }
 }

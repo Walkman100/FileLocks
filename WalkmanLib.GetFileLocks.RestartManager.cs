@@ -88,7 +88,7 @@ namespace WalkmanLib.GetFileLocks
                                     [In, Out] ProcessInfo[] rgAffectedApps,
                                     ref uint lpdwRebootReasons);
 
-        public static ProcessInfo[] GetProcessInfos(string path)
+        public static ProcessInfo[] GetLockingProcessInfos(string path)
         {
             uint handle;
             if (RmStartSession(out handle, 0, Guid.NewGuid().ToString()) != 0)
@@ -127,20 +127,16 @@ namespace WalkmanLib.GetFileLocks
             }
         }
 
-        public static List<Process> GetProcesses(string path)
+        public static List<Process> GetLockingProcesses(string path)
         {
-            ProcessInfo[] processInfos = GetProcessInfos(path);
-
-            List<Process> processes = new List<Process>(processInfos.Length);
-            // Enumerate all of the results and add them to the list to be returned
-            for (int i = 0; i < processInfos.Length; i++)
+            List<Process> processes = new List<Process>();
+            foreach (ProcessInfo pI in GetLockingProcessInfos(path))
             {
                 try
                 {
-                    Process process = Process.GetProcessById((int)processInfos[i].Process.ProcessID);
+                    Process process = Process.GetProcessById((int)pI.Process.ProcessID);
                     processes.Add(process);
                 }
-                // in case the process is no longer running
                 catch (ArgumentException) { }
             }
             return processes;
