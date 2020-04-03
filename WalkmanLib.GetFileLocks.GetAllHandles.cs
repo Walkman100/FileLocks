@@ -54,7 +54,7 @@ namespace WalkmanLib.GetFileLocks
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct SystemHandleEntry
+        public struct SystemHandleEntry
         {
             public int OwnerProcessId;
             public byte ObjectTypeNumber;
@@ -267,7 +267,7 @@ namespace WalkmanLib.GetFileLocks
             }
         }
 
-        public static IEnumerable<HandleInfo> GetHandles()
+        public static SystemHandleEntry[] GetSystemHandles()
         {
             // Attempt to retrieve the handle information
             int length = 0x10000;
@@ -294,15 +294,17 @@ namespace WalkmanLib.GetFileLocks
                 int handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : (int)Marshal.ReadInt64(ptr);
                 int offset = IntPtr.Size;
                 int size = Marshal.SizeOf(typeof(SystemHandleEntry));
+
+                SystemHandleEntry[] systemHandleEntries = new SystemHandleEntry[handleCount];
                 for (int i = 0; i < handleCount; i++)
                 {
                     SystemHandleEntry struc = (SystemHandleEntry)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SystemHandleEntry));
+                    systemHandleEntries[i] = struc;
 
-                    // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
-                    if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
-                        yield return new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
                     offset += size;
                 }
+
+                return systemHandleEntries;
             }
             finally
             {
@@ -313,51 +315,19 @@ namespace WalkmanLib.GetFileLocks
 
         public static IEnumerable<HandleInfo> GetFileHandles()
         {
-            // Attempt to retrieve the handle information
-            int length = 0x10000;
-            IntPtr ptr = IntPtr.Zero;
-            try
-            {
-                while (true)
-                {
-                    ptr = Marshal.AllocHGlobal(length);
-                    int wantedLength;
-                    NT_STATUS result = NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, out wantedLength);
-                    if (result == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
-                    {
-                        length = Math.Max(length, wantedLength);
-                        Marshal.FreeHGlobal(ptr);
-                        ptr = IntPtr.Zero;
-                    }
-                    else if (result == NT_STATUS.STATUS_SUCCESS)
-                        break;
-                    else
-                        throw new Exception("Failed to retrieve system handle information.", new System.ComponentModel.Win32Exception());
-                }
+            SystemHandleEntry[] systemHandleEntries = GetSystemHandles();
 
-                int handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : (int)Marshal.ReadInt64(ptr);
-                int offset = IntPtr.Size;
-                int size = Marshal.SizeOf(typeof(SystemHandleEntry));
-                for (int i = 0; i < handleCount; i++)
-                {
-                    SystemHandleEntry struc = (SystemHandleEntry)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SystemHandleEntry));
-
-                    // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
-                    if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
-                    {
-                        HandleInfo hi = new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
-                        if (hi.Type == HandleType.File && hi.Name != null)
-                        {
-                            yield return hi;
-                        }
-                    }
-                    offset += size;
-                }
-            }
-            finally
+            foreach (SystemHandleEntry struc in systemHandleEntries)
             {
-                if (ptr != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptr);
+                // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
+                if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
+                {
+                    HandleInfo hi = new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
+                    if (hi.Type == HandleType.File && hi.Name != null)
+                    {
+                        yield return hi;
+                    }
+                }
             }
         }
     }
