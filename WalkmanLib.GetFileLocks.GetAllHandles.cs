@@ -111,13 +111,15 @@ namespace WalkmanLib.GetFileLocks
             public ushort Handle { get; private set; }
             public int GrantedAccess { get; private set; }
             public byte RawType { get; private set; }
+            public byte Flags { get; private set; }
 
-            public HandleInfo(int processId, ushort handle, int grantedAccess, byte rawType)
+            public HandleInfo(int processId, ushort handle, int grantedAccess, byte rawType, byte flags)
             {
                 ProcessId = processId;
                 Handle = handle;
                 GrantedAccess = grantedAccess;
                 RawType = rawType;
+                Flags = flags;
             }
 
             private static Dictionary<byte, string> _rawTypeMap = new Dictionary<byte, string>();
@@ -183,7 +185,14 @@ namespace WalkmanLib.GetFileLocks
                     _type = HandleTypeFromString(_typeStr);
 
                     // Query the object name
-                    if (_typeStr != null && GrantedAccess != 0x0012019f && GrantedAccess != 0x00120189 && GrantedAccess != 0x120089) // don't query some objects that could get stuck
+                    if (_typeStr != null &&
+                        !(GrantedAccess == 0x0012019f && Flags == 0) &&
+                        !(GrantedAccess == 0x0012019f && Flags == 2) &&
+                        !(GrantedAccess == 0x00120189 && Flags == 2) &&
+                        !(GrantedAccess == 0x00120189 && Flags == 0) &&
+                        !(GrantedAccess == 0x001a019f && Flags == 2) &&
+                        !(GrantedAccess == 0x00120089 && Flags == 2)
+                        )// don't query some objects that could get stuck
                     {
                         int length;
                         NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, out length);
@@ -319,15 +328,9 @@ namespace WalkmanLib.GetFileLocks
 
             foreach (SystemHandleEntry struc in systemHandleEntries)
             {
-                // see https://gist.github.com/i-e-b/2290426#gistcomment-3234676
-                if (!(struc.GrantedAccess == 0x001a019f && struc.Flags == 2))
-                {
-                    HandleInfo hi = new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber);
-                    if (hi.Type == HandleType.File && hi.Name != null)
-                    {
-                        yield return hi;
-                    }
-                }
+                HandleInfo hi = new HandleInfo(struc.OwnerProcessId, struc.Handle, struc.GrantedAccess, struc.ObjectTypeNumber, struc.Flags);
+                if (hi.Type == HandleType.File && hi.Name != null)
+                    yield return hi;
             }
         }
     }
