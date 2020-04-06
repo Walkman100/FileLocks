@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.ComponentModel;
 
-namespace WalkmanLib.GetFileLocks
+namespace WalkmanLib
 {
     public static class RestartManager
     {
@@ -49,6 +49,7 @@ namespace WalkmanLib.GetFileLocks
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ne-restartmanager-rm_app_type
+        // values: https://github.com/microsoft/msbuild/blob/2791d9d93e88325011eb6907579d6fdac0b1b62e/src/Tasks/LockCheck.cs#L101
         public enum AppType
         {
             RmUnknownApp = 0,
