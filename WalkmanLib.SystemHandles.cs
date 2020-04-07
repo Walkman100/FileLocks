@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
@@ -289,6 +290,13 @@ namespace WalkmanLib
             DUPLICATE_SAME_ACCESS =  0x00000002
         }
 
+        //http://www.jasinskionline.com/TechnicalWiki/SYSTEM_HANDLE_INFORMATION-WinApi-Struct.ashx
+        internal enum SYSTEM_HANDLE_FLAGS : byte
+        {
+            PROTECT_FROM_CLOSE = 0x01,
+            INHERIT =            0x02
+        }
+
         //https://www.winehq.org/pipermail/wine-patches/2005-October/021642.html
         //https://github.com/olimsaidov/autorun-remover/blob/b558df6487ae1cb4cb998fab3330c07bb7de0f21/NativeAPI.pas#L108
         internal enum SYSTEM_HANDLE_TYPE
@@ -327,17 +335,30 @@ namespace WalkmanLib
 
         #region Structs
 
-        //https://stackoverflow.com/a/5163277/2999220
-        //http://www.jasinskionline.com/TechnicalWiki/SYSTEM_HANDLE_INFORMATION-WinApi-Struct.ashx
+        //https://www.codeproject.com/script/Articles/ViewDownloads.aspx?aid=18975&zep=OpenedFileFinder%2fUtils.h&rzp=%2fKB%2fshell%2fOpenedFileFinder%2f%2fopenedfilefinder_src.zip
         [StructLayout(LayoutKind.Sequential)]
         internal struct SYSTEM_HANDLE_INFORMATION
         {
-            uint    dwProcessId;
-            byte    bObjectType;
-            byte    bFlags;
-            ushort  wValue;
-            IntPtr  pAddress;
-            uint    GrantedAccess;
+            //public IntPtr dwCount;
+            public uint dwCount;
+            
+            // see https://stackoverflow.com/a/38884095/2999220 - MarshalAs doesn't allow variable sized arrays
+            //[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct)]
+            //public SYSTEM_HANDLE[] Handles;
+            public IntPtr Handles;
+        }
+
+        //https://stackoverflow.com/a/5163277/2999220
+        //http://www.jasinskionline.com/TechnicalWiki/SYSTEM_HANDLE_INFORMATION-WinApi-Struct.ashx
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct SYSTEM_HANDLE
+        {
+            public uint                dwProcessId;
+            public byte                bObjectType;
+            public SYSTEM_HANDLE_FLAGS bFlags;
+            public ushort              wValue;
+                   IntPtr              pAddress;
+            public uint                GrantedAccess;
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
@@ -386,7 +407,7 @@ namespace WalkmanLib
         {
             public UNICODE_STRING Name;
         }
-        
+
         //https://docs.microsoft.com/en-za/windows-hardware/drivers/ddi/ntifs/ns-ntifs-__public_object_type_information
         //http://www.jasinskionline.com/technicalwiki/OBJECT_TYPE_INFORMATION-WinApi-Struct.ashx
         [StructLayout(LayoutKind.Sequential)]
@@ -395,20 +416,20 @@ namespace WalkmanLib
             public UNICODE_STRING   TypeName;
             public int              ObjectCount;
             public int              HandleCount;
-            public int              Reserved1;
-            public int              Reserved2;
-            public int              Reserved3;
-            public int              Reserved4;
+            int                     Reserved1;
+            int                     Reserved2;
+            int                     Reserved3;
+            int                     Reserved4;
             public int              PeakObjectCount;
             public int              PeakHandleCount;
-            public int              Reserved5;
-            public int              Reserved6;
-            public int              Reserved7;
-            public int              Reserved8;
+            int                     Reserved5;
+            int                     Reserved6;
+            int                     Reserved7;
+            int                     Reserved8;
             public int              InvalidAttributes;
             public GENERIC_MAPPING  GenericMapping;
             public int              ValidAccess;
-            public byte             Unknown;
+            byte                    Unknown;
             public byte             MaintainHandleDatabase;
             public int              PoolType;
             public int              PagedPoolUsage;
@@ -425,7 +446,7 @@ namespace WalkmanLib
             [In]  SYSTEM_INFORMATION_CLASS SystemInformationClass,
             [Out] IntPtr                   SystemInformation,
             [In]  uint                     SystemInformationLength,
-            [Out] out UIntPtr              ReturnLength
+            [Out] out uint                 ReturnLength
         );
 
         //https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
@@ -483,5 +504,57 @@ namespace WalkmanLib
         #endregion
 
         #endregion
+
+        #region Public Methods
+
+        public static IEnumerable<SYSTEM_HANDLE> GetSystemHandles()
+        {
+            uint length = 0x1000;
+            IntPtr ptr = IntPtr.Zero;
+            bool done = false;
+            try
+            {
+                while (!done)
+                {
+                    ptr = Marshal.AllocHGlobal((int)length);
+                    uint wantedLength;
+                    switch (NtQuerySystemInformation(
+                        SYSTEM_INFORMATION_CLASS.SystemHandleInformation,
+                        ptr, length, out wantedLength))
+                    {
+                        case NTSTATUS.STATUS_SUCCESS:
+                            done = true;
+                            break;
+                        case NTSTATUS.STATUS_INFO_LENGTH_MISMATCH:
+                            length = Math.Max(length, wantedLength);
+                            Marshal.FreeHGlobal(ptr);
+                            ptr = IntPtr.Zero;
+                            break;
+                        default:
+                            throw new Exception("Failed to retrieve system handle information.", new Win32Exception());
+                    }
+                }
+
+                int handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : (int)Marshal.ReadInt64(ptr);
+                int offset = IntPtr.Size;
+                int size = Marshal.SizeOf(typeof(SYSTEM_HANDLE));
+
+                for (int i = 0; i < handleCount; i++)
+                {
+                    SYSTEM_HANDLE struc = Marshal.PtrToStructure<SYSTEM_HANDLE>((IntPtr)((int)ptr + offset));
+                    yield return struc;
+
+                    offset += size;
+                }
+            }
+            finally
+            {
+                if (ptr != IntPtr.Zero)
+                    Marshal.FreeHGlobal(ptr);
+            }
+        }
+
+        #endregion
+
     }
 }
