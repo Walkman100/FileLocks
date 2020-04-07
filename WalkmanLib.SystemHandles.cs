@@ -23,7 +23,7 @@ namespace WalkmanLib
 
         //https://pinvoke.net/default.aspx/Enums.NtStatus
         //https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55
-        internal enum NTSTATUS : uint
+        protected enum NTSTATUS : uint
         {
             STATUS_SUCCESS =              0x00000000,
             STATUS_BUFFER_OVERFLOW =      0x80000005,
@@ -31,7 +31,7 @@ namespace WalkmanLib
         }
 
         //https://www.pinvoke.net/default.aspx/ntdll/SYSTEM_INFORMATION_CLASS.html
-        internal enum SYSTEM_INFORMATION_CLASS
+        protected enum SYSTEM_INFORMATION_CLASS
         {
             SystemBasicInformation =                                0x00,
             SystemProcessorInformation =                            0x01,
@@ -247,7 +247,7 @@ namespace WalkmanLib
         }
 
         //https://www.pinvoke.net/default.aspx/Enums.OBJECT_INFORMATION_CLASS
-        internal enum OBJECT_INFORMATION_CLASS
+        protected enum OBJECT_INFORMATION_CLASS
         {
             ObjectBasicInformation =    0,
             ObjectNameInformation =     1,
@@ -258,7 +258,7 @@ namespace WalkmanLib
 
         //https://docs.microsoft.com/en-za/windows/win32/procthread/process-security-and-access-rights
         //https://www.pinvoke.net/default.aspx/Enums.ProcessAccess
-        internal enum PROCESS_ACCESS_RIGHTS
+        protected enum PROCESS_ACCESS_RIGHTS
         {
             PROCESS_TERMINATE =                 0x00000001,
             PROCESS_CREATE_THREAD =             0x00000002,
@@ -284,7 +284,7 @@ namespace WalkmanLib
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle#DUPLICATE_CLOSE_SOURCE
-        internal enum DUPLICATE_HANDLE_OPTIONS
+        protected enum DUPLICATE_HANDLE_OPTIONS
         {
             DUPLICATE_CLOSE_SOURCE = 0x00000001,
             DUPLICATE_SAME_ACCESS =  0x00000002
@@ -337,7 +337,7 @@ namespace WalkmanLib
 
         //https://www.codeproject.com/script/Articles/ViewDownloads.aspx?aid=18975&zep=OpenedFileFinder%2fUtils.h&rzp=%2fKB%2fshell%2fOpenedFileFinder%2f%2fopenedfilefinder_src.zip
         [StructLayout(LayoutKind.Sequential)]
-        internal struct SYSTEM_HANDLE_INFORMATION
+        protected struct SYSTEM_HANDLE_INFORMATION
         {
             //public IntPtr dwCount;
             public uint dwCount;
@@ -364,7 +364,7 @@ namespace WalkmanLib
         //https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
         //https://www.pinvoke.net/default.aspx/Structures/UNICODE_STRING.html
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        internal struct UNICODE_STRING : IDisposable
+        protected struct UNICODE_STRING : IDisposable
         {
             public ushort Length;
             public ushort MaximumLength;
@@ -393,7 +393,7 @@ namespace WalkmanLib
         //https://www.pinvoke.net/default.aspx/Structures.GENERIC_MAPPING
         //http://www.jasinskionline.com/technicalwiki/GENERIC_MAPPING-WinApi-Struct.ashx
         [StructLayout(LayoutKind.Sequential)]
-        internal struct GENERIC_MAPPING
+        protected struct GENERIC_MAPPING
         {
             public uint GenericRead;
             public uint GenericWrite;
@@ -403,7 +403,7 @@ namespace WalkmanLib
 
         //http://www.jasinskionline.com/technicalwiki/OBJECT_NAME_INFORMATION-WinApi-Struct.ashx
         [StructLayout(LayoutKind.Sequential)]
-        internal struct OBJECT_NAME_INFORMATION
+        protected struct OBJECT_NAME_INFORMATION
         {
             public UNICODE_STRING Name;
         }
@@ -411,7 +411,7 @@ namespace WalkmanLib
         //https://docs.microsoft.com/en-za/windows-hardware/drivers/ddi/ntifs/ns-ntifs-__public_object_type_information
         //http://www.jasinskionline.com/technicalwiki/OBJECT_TYPE_INFORMATION-WinApi-Struct.ashx
         [StructLayout(LayoutKind.Sequential)]
-        internal struct OBJECT_TYPE_INFORMATION
+        protected struct OBJECT_TYPE_INFORMATION
         {
             public UNICODE_STRING   TypeName;
             public int              ObjectCount;
@@ -442,7 +442,7 @@ namespace WalkmanLib
 
         //https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation
         [DllImport("ntdll.dll")]
-        internal static extern NTSTATUS NtQuerySystemInformation(
+        protected static extern NTSTATUS NtQuerySystemInformation(
             [In]  SYSTEM_INFORMATION_CLASS SystemInformationClass,
             [Out] IntPtr                   SystemInformation,
             [In]  uint                     SystemInformationLength,
@@ -451,7 +451,7 @@ namespace WalkmanLib
 
         //https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
         [DllImport("ntdll.dll")]
-        internal static extern NTSTATUS NtQueryObject(
+        protected static extern NTSTATUS NtQueryObject(
             [In]  IntPtr                   Handle,
             [In]  OBJECT_INFORMATION_CLASS ObjectInformationClass,
             [In]  IntPtr                   ObjectInformation,
@@ -461,7 +461,7 @@ namespace WalkmanLib
 
         //https://docs.microsoft.com/en-za/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
         [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern IntPtr OpenProcess(
+        protected static extern IntPtr OpenProcess(
             [In]                                PROCESS_ACCESS_RIGHTS dwDesiredAccess,
             [In, MarshalAs(UnmanagedType.Bool)] bool                  bInheritHandle,
             [In]                                uint                  dwProcessId
@@ -470,7 +470,7 @@ namespace WalkmanLib
         //https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool DuplicateHandle(
+        protected static extern bool DuplicateHandle(
             [In]                                IntPtr                   hSourceProcessHandle,
             [In]                                IntPtr                   hSourceHandle,
             [In]                                IntPtr                   hTargetProcessHandle,
@@ -482,20 +482,20 @@ namespace WalkmanLib
 
         //https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess
         [DllImport("kernel32.dll")]
-        internal static extern IntPtr GetCurrentProcess();
+        protected static extern IntPtr GetCurrentProcess();
 
         //https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool CloseHandle(
+        protected static extern bool CloseHandle(
             [In] IntPtr hObject
         );
 
         //https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-querydosdevicea
         //https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
         [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern uint QueryDosDevice(
+        protected static extern uint QueryDosDevice(
             [In]  string        lpDeviceName,
             [Out] StringBuilder lpTargetPath,
             [In]  uint          ucchMax
@@ -507,7 +507,7 @@ namespace WalkmanLib
 
         #region Public Methods
 
-        public static IEnumerable<SYSTEM_HANDLE> GetSystemHandles()
+        internal static IEnumerable<SYSTEM_HANDLE> GetSystemHandles()
         {
             uint length = 0x1000;
             IntPtr ptr = IntPtr.Zero;
@@ -552,6 +552,32 @@ namespace WalkmanLib
                 if (ptr != IntPtr.Zero)
                     Marshal.FreeHGlobal(ptr);
             }
+        }
+
+        internal struct HandleInfo
+        {
+            public uint ProcessID;
+            public ushort HandleID;
+            public uint GrantedAccess;
+            public byte RawType;
+            public SYSTEM_HANDLE_FLAGS Flags;
+            public string Name;
+            public string TypeString;
+            public SYSTEM_HANDLE_TYPE Type;
+        }
+
+        internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle)
+        {
+            HandleInfo handleInfo = new HandleInfo
+            {
+                ProcessID = handle.dwProcessId,
+                HandleID = handle.wValue,
+                GrantedAccess = handle.GrantedAccess,
+                RawType = handle.bObjectType,
+                Flags = handle.bFlags
+            };
+
+            return handleInfo;
         }
 
         #endregion
