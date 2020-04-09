@@ -456,7 +456,7 @@ namespace WalkmanLib
             [In]  OBJECT_INFORMATION_CLASS ObjectInformationClass,
             [In]  IntPtr                   ObjectInformation,
             [In]  uint                     ObjectInformationLength,
-            [Out] out UIntPtr              ReturnLength
+            [Out] out uint                 ReturnLength
         );
 
         //https://docs.microsoft.com/en-za/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
@@ -554,6 +554,7 @@ namespace WalkmanLib
             }
         }
 
+
         internal struct HandleInfo
         {
             public uint ProcessID;
@@ -566,6 +567,8 @@ namespace WalkmanLib
             public SYSTEM_HANDLE_TYPE Type;
         }
 
+        private static Dictionary<byte, string> rawTypeMap = new Dictionary<byte, string>();
+
         internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle)
         {
             HandleInfo handleInfo = new HandleInfo
@@ -574,8 +577,65 @@ namespace WalkmanLib
                 HandleID = handle.wValue,
                 GrantedAccess = handle.GrantedAccess,
                 RawType = handle.bObjectType,
-                Flags = handle.bFlags
+                Flags = handle.bFlags,
+                Name = null,
+                TypeString = null,
+                Type = SYSTEM_HANDLE_TYPE.OB_TYPE_UNKNOWN
             };
+
+            if (rawTypeMap.ContainsKey(handleInfo.RawType))
+            {
+                handleInfo.TypeString = rawTypeMap[handleInfo.RawType];
+                handleInfo.Type = HandleTypeFromString(handleInfo.TypeString);
+            }
+            else
+            {
+                IntPtr sourceProcessHandle = IntPtr.Zero;
+                IntPtr handleDuplicate = IntPtr.Zero;
+                try
+                {
+                    sourceProcessHandle = OpenProcess(PROCESS_ACCESS_RIGHTS.PROCESS_DUP_HANDLE, true, handleInfo.ProcessID);
+
+                    // To read info about a handle owned by another process we must duplicate it into ours
+                    // For simplicity, current process handles will also get duplicated; remember that process handles cannot be compared for equality
+                    if (!DuplicateHandle(sourceProcessHandle, (IntPtr)handleInfo.HandleID, GetCurrentProcess(), out handleDuplicate, 0, false, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_SAME_ACCESS))
+                        return handleInfo;
+
+                    uint length;
+                    NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, IntPtr.Zero, 0, out length);
+
+                    IntPtr ptr = IntPtr.Zero;
+                    try
+                    {
+                        ptr = Marshal.AllocHGlobal((int)length);
+                        if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) != NTSTATUS.STATUS_SUCCESS)
+                            return handleInfo;
+
+                        handleInfo.TypeString = Marshal.PtrToStringUni(
+                            (IntPtr)
+                            (
+                                (int)ptr + 0x58 + (
+                                    2 * IntPtr.Size
+                                )
+                            )
+                        );
+
+                        rawTypeMap[handleInfo.RawType] = handleInfo.TypeString;
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(ptr);
+                    }
+
+                    handleInfo.Type = HandleTypeFromString(handleInfo.TypeString);
+                }
+                finally
+                {
+                    CloseHandle(sourceProcessHandle);
+                    if (handleDuplicate != IntPtr.Zero)
+                        CloseHandle(handleDuplicate);
+                }
+            }
 
             return handleInfo;
         }
