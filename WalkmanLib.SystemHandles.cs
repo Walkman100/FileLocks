@@ -703,7 +703,14 @@ namespace WalkmanLib
                 }
 
                 // Get the object name
-                if (handleInfo.TypeString != null)
+                if (handleInfo.TypeString != null &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == 0x00                       ) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == 0x00                       ) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT)
+                    )// don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
                 {
                     uint length;
                     NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, out length);
@@ -715,7 +722,8 @@ namespace WalkmanLib
                         if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length) != NTSTATUS.STATUS_SUCCESS)
                             return handleInfo;
 
-                        handleInfo.Name = Marshal.PtrToStringUni((IntPtr)((int)ptr + (2 * IntPtr.Size)));
+                        OBJECT_NAME_INFORMATION nameInfo = Marshal.PtrToStructure<OBJECT_NAME_INFORMATION>(ptr);
+                        handleInfo.Name = nameInfo.Name.Buffer;
                     }
                     finally
                     {
