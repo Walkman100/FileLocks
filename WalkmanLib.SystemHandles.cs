@@ -301,34 +301,50 @@ namespace WalkmanLib
         //https://github.com/olimsaidov/autorun-remover/blob/b558df6487ae1cb4cb998fab3330c07bb7de0f21/NativeAPI.pas#L108
         internal enum SYSTEM_HANDLE_TYPE
         {
-            OB_TYPE_UNKNOWN =        00,
-            OB_TYPE_TYPE =           01,
-            OB_TYPE_DIRECTORY =      02,
-            OB_TYPE_SYMBOLIC_LINK =  03,
-            OB_TYPE_TOKEN =          04,
-            OB_TYPE_PROCESS =        05,
-            OB_TYPE_THREAD =         06,
-            OB_TYPE_JOB =            07,
-            OB_TYPE_EVENT =          08,
-            OB_TYPE_EVENT_PAIR =     09,
-            OB_TYPE_MUTANT =         10,
-            OB_TYPE_UNKNOWN_11 =     11,
-            OB_TYPE_SEMAPHORE =      12,
-            OB_TYPE_TIMER =          13,
-            OB_TYPE_PROFILE =        14,
-            OB_TYPE_WINDOW_STATION = 15,
-            OB_TYPE_DESKTOP =        16,
-            OB_TYPE_SECTION =        17,
-            OB_TYPE_KEY =            18,
-            OB_TYPE_PORT =           19,
-            OB_TYPE_WAITABLE_PORT =  20,
-            OB_TYPE_ADAPTER =        21,
-            OB_TYPE_CONTROLLER =     22,
-            OB_TYPE_DEVICE =         23,
-            OB_TYPE_DRIVER =         24,
-            OB_TYPE_IO_COMPLETION =  25,
-            OB_TYPE_FILE =           28,
+            UNKNOWN =        00,
+            TYPE =           01,
+            DIRECTORY =      02,
+            SYMBOLIC_LINK =  03,
+            TOKEN =          04,
+            PROCESS =        05,
+            THREAD =         06,
+            JOB =            07,
+            EVENT =          08,
+            EVENT_PAIR =     09,
+            MUTANT =         10,
+            UNKNOWN_11 =     11,
+            SEMAPHORE =      12,
+            TIMER =          13,
+            PROFILE =        14,
+            WINDOW_STATION = 15,
+            DESKTOP =        16,
+            SECTION =        17,
+            KEY =            18,
+            PORT =           19,
+            WAITABLE_PORT =  20,
+            ADAPTER =        21,
+            CONTROLLER =     22,
+            DEVICE =         23,
+            DRIVER =         24,
+            IO_COMPLETION =  25,
+            FILE =           28,
 
+            // From my own research
+            TP_WORKER_FACTORY,
+            ALPC_PORT,
+            KEYED_EVENT,
+            SESSION,
+            IO_COMPLETION_RESERVE,
+            WMI_GUID,
+            USER_APC_RESERVE,
+            IR_TIMER,
+            COMPOSITION,
+            WAIT_COMPLETION_PACKET,
+            DXGK_SHARED_RESOURCE,
+            DXGK_SHARED_SYNC_OBJECT,
+            DXGK_DISPLAY_MANAGER_OBJECT,
+            DXGK_COMPOSITION_OBJECT,
+            OTHER
         }
 
         #endregion
@@ -364,29 +380,18 @@ namespace WalkmanLib
         //https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
         //https://www.pinvoke.net/default.aspx/Structures/UNICODE_STRING.html
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        protected struct UNICODE_STRING : IDisposable
+        protected struct UNICODE_STRING
         {
-            public ushort Length;
-            public ushort MaximumLength;
-            //[MarshalAs(UnmanagedType.LPWStr)]
-            private IntPtr Buffer;
+            public readonly ushort Length;
+            public readonly ushort MaximumLength;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public readonly string Buffer;
 
             public UNICODE_STRING(string s)
             {
                 Length = (ushort)(s.Length * 2);
                 MaximumLength = (ushort)(Length + 2);
-                Buffer = Marshal.StringToHGlobalUni(s);
-            }
-
-            public void Dispose()
-            {
-                Marshal.FreeHGlobal(Buffer);
-                Buffer = IntPtr.Zero;
-            }
-
-            public override string ToString()
-            {
-                return Marshal.PtrToStringUni(Buffer);
+                Buffer = s;
             }
         }
 
@@ -569,6 +574,77 @@ namespace WalkmanLib
 
         private static Dictionary<byte, string> rawTypeMap = new Dictionary<byte, string>();
 
+        private static SYSTEM_HANDLE_TYPE HandleTypeFromString(string typeString)
+        {
+            switch (typeString)
+            {
+                case null:
+                    return SYSTEM_HANDLE_TYPE.UNKNOWN;
+                case "Directory":
+                    return SYSTEM_HANDLE_TYPE.DIRECTORY;
+                case "SymbolicLink":
+                    return SYSTEM_HANDLE_TYPE.SYMBOLIC_LINK;
+                case "Token":
+                    return SYSTEM_HANDLE_TYPE.TOKEN;
+                case "Process":
+                    return SYSTEM_HANDLE_TYPE.PROCESS;
+                case "Thread":
+                    return SYSTEM_HANDLE_TYPE.THREAD;
+                case "Job":
+                    return SYSTEM_HANDLE_TYPE.JOB;
+                case "Event":
+                    return SYSTEM_HANDLE_TYPE.EVENT;
+                case "Mutant":
+                    return SYSTEM_HANDLE_TYPE.MUTANT;
+                case "Semaphore":
+                    return SYSTEM_HANDLE_TYPE.SEMAPHORE;
+                case "Timer":
+                    return SYSTEM_HANDLE_TYPE.TIMER;
+                case "WindowStation":
+                    return SYSTEM_HANDLE_TYPE.WINDOW_STATION;
+                case "Desktop":
+                    return SYSTEM_HANDLE_TYPE.DESKTOP;
+                case "Section":
+                    return SYSTEM_HANDLE_TYPE.SECTION;
+                case "Key":
+                    return SYSTEM_HANDLE_TYPE.KEY;
+                case "IoCompletion":
+                    return SYSTEM_HANDLE_TYPE.IO_COMPLETION;
+                case "File":
+                    return SYSTEM_HANDLE_TYPE.FILE;
+                case "TpWorkerFactory":
+                    return SYSTEM_HANDLE_TYPE.TP_WORKER_FACTORY;
+                case "ALPC Port":
+                    return SYSTEM_HANDLE_TYPE.ALPC_PORT;
+                case "KeyedEvent":
+                    return SYSTEM_HANDLE_TYPE.KEYED_EVENT;
+                case "Session":
+                    return SYSTEM_HANDLE_TYPE.SESSION;
+                case "IoCompletionReserve":
+                    return SYSTEM_HANDLE_TYPE.IO_COMPLETION_RESERVE;
+                case "WmiGuid":
+                    return SYSTEM_HANDLE_TYPE.WMI_GUID;
+                case "UserApcReserve":
+                    return SYSTEM_HANDLE_TYPE.USER_APC_RESERVE;
+                case "IRTimer":
+                    return SYSTEM_HANDLE_TYPE.IR_TIMER;
+                case "Composition":
+                    return SYSTEM_HANDLE_TYPE.COMPOSITION;
+                case "WaitCompletionPacket":
+                    return SYSTEM_HANDLE_TYPE.WAIT_COMPLETION_PACKET;
+                case "DxgkSharedResource":
+                    return SYSTEM_HANDLE_TYPE.DXGK_SHARED_RESOURCE;
+                case "DxgkSharedSyncObject":
+                    return SYSTEM_HANDLE_TYPE.DXGK_SHARED_SYNC_OBJECT;
+                case "DxgkDisplayManagerObject":
+                    return SYSTEM_HANDLE_TYPE.DXGK_DISPLAY_MANAGER_OBJECT;
+                case "DxgkCompositionObject":
+                    return SYSTEM_HANDLE_TYPE.DXGK_COMPOSITION_OBJECT;
+                default:
+                    return SYSTEM_HANDLE_TYPE.OTHER;
+            }
+        }
+
         internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle)
         {
             HandleInfo handleInfo = new HandleInfo
@@ -580,7 +656,7 @@ namespace WalkmanLib
                 Flags = handle.bFlags,
                 Name = null,
                 TypeString = null,
-                Type = SYSTEM_HANDLE_TYPE.OB_TYPE_UNKNOWN
+                Type = SYSTEM_HANDLE_TYPE.UNKNOWN
             };
 
             if (rawTypeMap.ContainsKey(handleInfo.RawType))
@@ -611,14 +687,8 @@ namespace WalkmanLib
                         if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) != NTSTATUS.STATUS_SUCCESS)
                             return handleInfo;
 
-                        handleInfo.TypeString = Marshal.PtrToStringUni(
-                            (IntPtr)
-                            (
-                                (int)ptr + 0x58 + (
-                                    2 * IntPtr.Size
-                                )
-                            )
-                        );
+                        OBJECT_TYPE_INFORMATION typeInfo = Marshal.PtrToStructure<OBJECT_TYPE_INFORMATION>(ptr);
+                        handleInfo.TypeString = typeInfo.TypeName.Buffer;
 
                         rawTypeMap[handleInfo.RawType] = handleInfo.TypeString;
                     }
