@@ -659,24 +659,27 @@ namespace WalkmanLib
                 Type = SYSTEM_HANDLE_TYPE.UNKNOWN
             };
 
+            // get type from cached map if it exists
             if (rawTypeMap.ContainsKey(handleInfo.RawType))
             {
                 handleInfo.TypeString = rawTypeMap[handleInfo.RawType];
                 handleInfo.Type = HandleTypeFromString(handleInfo.TypeString);
             }
-            else
+
+            IntPtr sourceProcessHandle = IntPtr.Zero;
+            IntPtr handleDuplicate = IntPtr.Zero;
+            try
             {
-                IntPtr sourceProcessHandle = IntPtr.Zero;
-                IntPtr handleDuplicate = IntPtr.Zero;
-                try
+                sourceProcessHandle = OpenProcess(PROCESS_ACCESS_RIGHTS.PROCESS_DUP_HANDLE, true, handleInfo.ProcessID);
+
+                // To read info about a handle owned by another process we must duplicate it into ours
+                // For simplicity, current process handles will also get duplicated; remember that process handles cannot be compared for equality
+                if (!DuplicateHandle(sourceProcessHandle, (IntPtr)handleInfo.HandleID, GetCurrentProcess(), out handleDuplicate, 0, false, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_SAME_ACCESS))
+                    return handleInfo;
+
+                // Get the object type if it hasn't been retrieved from cache map above
+                if (!rawTypeMap.ContainsKey(handleInfo.RawType))
                 {
-                    sourceProcessHandle = OpenProcess(PROCESS_ACCESS_RIGHTS.PROCESS_DUP_HANDLE, true, handleInfo.ProcessID);
-
-                    // To read info about a handle owned by another process we must duplicate it into ours
-                    // For simplicity, current process handles will also get duplicated; remember that process handles cannot be compared for equality
-                    if (!DuplicateHandle(sourceProcessHandle, (IntPtr)handleInfo.HandleID, GetCurrentProcess(), out handleDuplicate, 0, false, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_SAME_ACCESS))
-                        return handleInfo;
-
                     uint length;
                     NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, IntPtr.Zero, 0, out length);
 
@@ -689,22 +692,42 @@ namespace WalkmanLib
 
                         OBJECT_TYPE_INFORMATION typeInfo = Marshal.PtrToStructure<OBJECT_TYPE_INFORMATION>(ptr);
                         handleInfo.TypeString = typeInfo.TypeName.Buffer;
-
-                        rawTypeMap[handleInfo.RawType] = handleInfo.TypeString;
                     }
                     finally
                     {
                         Marshal.FreeHGlobal(ptr);
                     }
 
+                    rawTypeMap[handleInfo.RawType] = handleInfo.TypeString;
                     handleInfo.Type = HandleTypeFromString(handleInfo.TypeString);
                 }
-                finally
+
+                // Get the object name
+                if (handleInfo.TypeString != null)
                 {
-                    CloseHandle(sourceProcessHandle);
-                    if (handleDuplicate != IntPtr.Zero)
-                        CloseHandle(handleDuplicate);
+                    uint length;
+                    NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, out length);
+
+                    IntPtr ptr = IntPtr.Zero;
+                    try
+                    {
+                        ptr = Marshal.AllocHGlobal((int)length);
+                        if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length) != NTSTATUS.STATUS_SUCCESS)
+                            return handleInfo;
+
+                        handleInfo.Name = Marshal.PtrToStringUni((IntPtr)((int)ptr + (2 * IntPtr.Size)));
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(ptr);
+                    }
                 }
+            }
+            finally
+            {
+                CloseHandle(sourceProcessHandle);
+                if (handleDuplicate != IntPtr.Zero)
+                    CloseHandle(handleDuplicate);
             }
 
             return handleInfo;
