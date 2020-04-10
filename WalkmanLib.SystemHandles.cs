@@ -11,7 +11,12 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Security.Permissions;
+using System.Threading;
+using Microsoft.Win32.SafeHandles;
+using System.Diagnostics;
 
 namespace WalkmanLib
 {
@@ -369,12 +374,18 @@ namespace WalkmanLib
         [StructLayout(LayoutKind.Sequential)]
         internal struct SYSTEM_HANDLE
         {
-            public uint                dwProcessId;
-            public byte                bObjectType;
+            /// <summary>Handle Owner Process ID</summary>
+            public uint dwProcessId;
+            /// <summary>Object Type</summary>
+            public byte bObjectType;
+            /// <summary>Handle Flags</summary>
             public SYSTEM_HANDLE_FLAGS bFlags;
-            public ushort              wValue;
-                   IntPtr              pAddress;
-            public uint                GrantedAccess;
+            /// <summary>Handle Value</summary>
+            public ushort wValue;
+            /// <summary>Object Pointer</summary>
+            IntPtr pAddress;
+            /// <summary>Access Mask</summary>
+            public uint GrantedAccess;
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
@@ -512,6 +523,8 @@ namespace WalkmanLib
 
         #region Public Methods
 
+        #region GetSystemHandles
+
         internal static IEnumerable<SYSTEM_HANDLE> GetSystemHandles()
         {
             uint length = 0x1000;
@@ -528,7 +541,7 @@ namespace WalkmanLib
                         ptr, length, out wantedLength))
                     {
                         case NTSTATUS.STATUS_SUCCESS:
-                            done = true;
+                            done = true; // can't double-break in C#
                             break;
                         case NTSTATUS.STATUS_INFO_LENGTH_MISMATCH:
                             length = Math.Max(length, wantedLength);
@@ -559,6 +572,9 @@ namespace WalkmanLib
             }
         }
 
+        #endregion
+
+        #region GetHandleInfo
 
         internal struct HandleInfo
         {
@@ -743,5 +759,82 @@ namespace WalkmanLib
 
         #endregion
 
+        #region ConvertDevicePathToDosPath
+
+        private static Dictionary<string, string> deviceMap;
+        private const string networkDeviceQueryDosDevicePrefix = "\\Device\\LanmanRedirector\\";
+        private const string networkDeviceSystemHandlePrefix = "\\Device\\Mup\\";
+        private const int MAX_PATH = 260;
+
+        private static string NormalizeDeviceName(string deviceName)
+        {
+            if (string.Compare( // if deviceName.StartsWith(networkDeviceQueryDosDevicePrefix)
+                deviceName, 0,
+                networkDeviceQueryDosDevicePrefix, 0,
+                networkDeviceQueryDosDevicePrefix.Length, StringComparison.InvariantCulture) == 0)
+            {
+                string shareName = deviceName.Substring(deviceName.IndexOf('\\', networkDeviceQueryDosDevicePrefix.Length) + 1);
+                return string.Concat(networkDeviceSystemHandlePrefix, shareName);
+            }
+            return deviceName;
+        }
+
+        private static Dictionary<string, string> BuildDeviceMap()
+        {
+            string[] logicalDrives = Environment.GetLogicalDrives();
+            Dictionary<string, string> localDeviceMap = new Dictionary<string, string>(logicalDrives.Length);
+
+            StringBuilder lpTargetPath = new StringBuilder(MAX_PATH);
+            foreach (string drive in logicalDrives)
+            {
+                string lpDeviceName = drive.Substring(0, 2);
+
+                QueryDosDevice(lpDeviceName, lpTargetPath, MAX_PATH);
+
+                localDeviceMap.Add(
+                    NormalizeDeviceName(lpTargetPath.ToString()),
+                    lpDeviceName
+                );
+            }
+            // add a map so \\COMPUTER\ shares get picked up correctly - these will come as \Device\Mup\COMPUTER\share
+            localDeviceMap.Add(
+                // remove the last slash from networkDeviceSystemHandlePrefix:
+                networkDeviceSystemHandlePrefix.Substring(0, networkDeviceSystemHandlePrefix.Length - 1),
+                "\\");
+            return localDeviceMap;
+        }
+
+        private static void EnsureDeviceMap()
+        {
+            if (deviceMap == null)
+            {
+                Dictionary<string, string> localDeviceMap = BuildDeviceMap();
+                Interlocked.CompareExchange(ref deviceMap, localDeviceMap, null);
+            }
+        }
+
+        /// <summary>
+        /// Converts a device path to a DOS path. Requires a trailing slash if just the device path is passed.
+        /// Returns string.Empty if no device is found.
+        /// </summary>
+        /// <param name="devicePath">Full path including a device. Device paths usually start with \Device\HarddiskVolume[n]\</param>
+        /// <returns>DOS Path or string.Empty if none found</returns>
+        public static string ConvertDevicePathToDosPath(string devicePath)
+        {
+            EnsureDeviceMap();
+            int i = devicePath.Length;
+
+            // search in reverse, to catch network shares that are mapped before returning general network path
+            while (i > 0 && (i = devicePath.LastIndexOf('\\', i - 1)) != -1)
+            {
+                string drive;
+                if (deviceMap.TryGetValue(devicePath.Substring(0, i), out drive))
+                    return string.Concat(drive, devicePath.Substring(i));
+            }
+            return devicePath;
+        }
+        #endregion
+
+        #endregion
     }
 }
