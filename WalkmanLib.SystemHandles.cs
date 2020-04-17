@@ -385,7 +385,7 @@ namespace WalkmanLib
             /// <summary>Object Pointer</summary>
             IntPtr pAddress;
             /// <summary>Access Mask</summary>
-            public uint GrantedAccess;
+            public uint dwGrantedAccess;
         }
 
         //https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
@@ -661,13 +661,13 @@ namespace WalkmanLib
             }
         }
 
-        internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle)
+        internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle, SYSTEM_HANDLE_TYPE onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN)
         {
             HandleInfo handleInfo = new HandleInfo
             {
                 ProcessID = handle.dwProcessId,
                 HandleID = handle.wValue,
-                GrantedAccess = handle.GrantedAccess,
+                GrantedAccess = handle.dwGrantedAccess,
                 RawType = handle.bObjectType,
                 Flags = handle.bFlags,
                 Name = null,
@@ -720,11 +720,14 @@ namespace WalkmanLib
 
                 // Get the object name
                 if (handleInfo.TypeString != null &&
+                    // only check onlyGetNameFor if it isn't UNKNOWN
+                    (onlyGetNameFor == SYSTEM_HANDLE_TYPE.UNKNOWN || handleInfo.Type == onlyGetNameFor) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == 0x00                       ) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == 0x00                       ) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == 0x00                       ) &&
                     !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT)
                     )// don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
                 {
