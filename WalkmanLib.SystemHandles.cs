@@ -838,6 +838,47 @@ namespace WalkmanLib
         }
         #endregion
 
+        #region GetFileHandles / GetLockingProcesses
+
+        internal static IEnumerable<HandleInfo> GetFileHandles(string filePath)
+        {
+            if (File.Exists(filePath))
+                filePath = new FileInfo(filePath).FullName;
+            else if (Directory.Exists(filePath))
+                filePath = new DirectoryInfo(filePath).FullName;
+
+            foreach (SYSTEM_HANDLE systemHandle in GetSystemHandles())
+            {
+                HandleInfo handleInfo = GetHandleInfo(systemHandle, onlyGetNameFor: SYSTEM_HANDLE_TYPE.FILE);
+                if (handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.Name != null)
+                {
+                    handleInfo.Name = ConvertDevicePathToDosPath(handleInfo.Name);
+                    if (handleInfo.Name.Contains(filePath))
+                        yield return handleInfo;
+                }
+            }
+        }
+
+        public static List<Process> GetLockingProcesses(string filePath)
+        {
+            List<Process> processes = new List<Process>();
+            foreach (HandleInfo handleInfo in GetFileHandles(filePath))
+            {
+                Console.Write("Found...");
+                Console.ReadKey();
+                Console.WriteLine();
+                try
+                {
+                    Process process = Process.GetProcessById((int)handleInfo.ProcessID);
+                    processes.Add(process);
+                } // process has exited
+                catch (ArgumentException) { }
+            }
+            return processes;
+        }
+
+        #endregion
+
         #endregion
     }
 }
