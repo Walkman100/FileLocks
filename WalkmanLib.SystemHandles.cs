@@ -7,16 +7,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Security.Permissions;
 using System.Threading;
-using Microsoft.Win32.SafeHandles;
-using System.Diagnostics;
 
 namespace WalkmanLib
 {
@@ -525,6 +521,8 @@ namespace WalkmanLib
 
         #region GetSystemHandles
 
+        /// <summary>Gets all the open handles on the system. Use GetHandleInfo to retrieve proper type and name information.</summary>
+        /// <returns>Enumerable list of system handles</returns>
         internal static IEnumerable<SYSTEM_HANDLE> GetSystemHandles()
         {
             uint length = 0x1000;
@@ -661,6 +659,17 @@ namespace WalkmanLib
             }
         }
 
+        /// <summary>
+        /// Gets the handle type and name, and puts the other properties into more user-friendly fields.
+        /// 
+        /// This function gets typeInfo from an internal type map (rawType to typeString) that is built as types are retrieved.
+        /// To get full type information of handle types that could not be retrieved,
+        /// either put the handles into a list, build a second map and apply them retroactively,
+        /// or call this function on all System Handles beforehand with getting names Disabled.
+        /// </summary>
+        /// <param name="handle">Handle struct returned by GetSystemHandles</param>
+        /// <param name="onlyGetNameFor">Set this to only attempt to get Handle names for a specific handle type. Set to int.MaxValue to disable getting file names.</param>
+        /// <returns>HandleInfo struct with retrievable information populated.</returns>
         internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle, SYSTEM_HANDLE_TYPE onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN)
         {
             HandleInfo handleInfo = new HandleInfo
@@ -836,10 +845,17 @@ namespace WalkmanLib
             }
             return devicePath;
         }
+
         #endregion
 
         #region GetFileHandles / GetLockingProcesses
 
+        /// <summary>
+        /// Searches through all the open handles on the system, and returns handles with a path containing <paramref name="filePath"/>.
+        /// If on a network share, <paramref name="filePath"/> should refer to the deepest mapped drive.
+        /// </summary>
+        /// <param name="filePath">Path to look for handles to.</param>
+        /// <returns>Enumerable list of handles matching <paramref name="filePath"/></returns>
         internal static IEnumerable<HandleInfo> GetFileHandles(string filePath)
         {
             if (File.Exists(filePath))
@@ -859,14 +875,18 @@ namespace WalkmanLib
             }
         }
 
+        /// <summary>
+        /// Gets a list of processes locking <paramref name="filePath"/>.
+        /// Processes that can't be retrieved by PID (if they have exited) will be excluded.
+        /// If on a network share, <paramref name="filePath"/> should refer to the deepest mapped drive.
+        /// </summary>
+        /// <param name="filePath">Path to look for locking processes.</param>
+        /// <returns>List of processes locking <paramref name="filePath"/>.</returns>
         public static List<Process> GetLockingProcesses(string filePath)
         {
             List<Process> processes = new List<Process>();
             foreach (HandleInfo handleInfo in GetFileHandles(filePath))
             {
-                Console.Write("Found...");
-                Console.ReadKey();
-                Console.WriteLine();
                 try
                 {
                     Process process = Process.GetProcessById((int)handleInfo.ProcessID);
