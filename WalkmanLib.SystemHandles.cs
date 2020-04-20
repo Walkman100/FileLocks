@@ -771,6 +771,36 @@ namespace WalkmanLib
 
         #endregion
 
+        #region CloseSystemHandle
+
+        /// <summary>Attempts to close a handle in a different process. Fails silently if the handle exists but could not be closed.</summary>
+        /// <param name="ProcessID">Process ID of the process containing the handle to close</param>
+        /// <param name="HandleID">Handle value in the target process to close</param>
+        internal static void CloseSystemHandle(uint ProcessID, ushort HandleID)
+        {
+            IntPtr sourceProcessHandle = IntPtr.Zero;
+            IntPtr handleDuplicate = IntPtr.Zero;
+            try
+            {
+                sourceProcessHandle = OpenProcess(PROCESS_ACCESS_RIGHTS.PROCESS_DUP_HANDLE, true, ProcessID);
+                if ((int)sourceProcessHandle < 1)
+                    throw new ArgumentException("Process ID Not Found!", "ProcessID", new Win32Exception());
+
+                // always returns false, no point in checking
+                DuplicateHandle(sourceProcessHandle, (IntPtr)HandleID, GetCurrentProcess(), out handleDuplicate, 0, false, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_CLOSE_SOURCE);
+                if ((int)handleDuplicate < 1 && Marshal.GetLastWin32Error() == 6) // ERROR_INVALID_HANDLE: The handle is invalid.
+                    throw new ArgumentException("Handle ID Not Found!", "HandleID", new Win32Exception(6));
+            }
+            finally
+            {
+                CloseHandle(sourceProcessHandle);
+                if (handleDuplicate != IntPtr.Zero)
+                    CloseHandle(handleDuplicate);
+            }
+        }
+
+        #endregion
+
         #region ConvertDevicePathToDosPath
 
         private static Dictionary<string, string> deviceMap;
