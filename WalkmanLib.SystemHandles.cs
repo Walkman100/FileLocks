@@ -668,9 +668,10 @@ namespace WalkmanLib
         /// or call this function on all System Handles beforehand with getting names Disabled.
         /// </summary>
         /// <param name="handle">Handle struct returned by GetSystemHandles</param>
+        /// <param name="getAllNames">False (default) to ignore certain names that cause the system query to hang. Only set to true in a thread that can be killed.</param>
         /// <param name="onlyGetNameFor">Set this to only attempt to get Handle names for a specific handle type. Set to int.MaxValue to disable getting file names.</param>
         /// <returns>HandleInfo struct with retrievable information populated.</returns>
-        internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle, SYSTEM_HANDLE_TYPE onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN)
+        internal static HandleInfo GetHandleInfo(SYSTEM_HANDLE handle, bool getAllNames = false, SYSTEM_HANDLE_TYPE onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN)
         {
             HandleInfo handleInfo = new HandleInfo
             {
@@ -731,14 +732,15 @@ namespace WalkmanLib
                 if (handleInfo.TypeString != null &&
                     // only check onlyGetNameFor if it isn't UNKNOWN
                     (onlyGetNameFor == SYSTEM_HANDLE_TYPE.UNKNOWN || handleInfo.Type == onlyGetNameFor) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == 0x00                       ) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == 0x00                       ) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == 0x00                       ) &&
-                    !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT)
-                    )// don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
+                    (getAllNames == true || (
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == 0x00                       ) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == 0x00                       ) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x12019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == 0x00                       ) &&
+                        !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x1a019f && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT)
+                    )))// don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
                 {
                     uint length;
                     NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, out length);
