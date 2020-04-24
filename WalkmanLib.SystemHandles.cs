@@ -733,6 +733,8 @@ namespace WalkmanLib
                     // only check onlyGetNameFor if it isn't UNKNOWN
                     (onlyGetNameFor == SYSTEM_HANDLE_TYPE.UNKNOWN || handleInfo.Type == onlyGetNameFor) &&
                     (getAllNames == true || (
+                        // this type can hang for ~15mins, but excluding it cuts a lot of results, and it does eventually resolve...
+                        //!(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == 0x00                       ) &&
                         !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
                         !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == 0x00                       ) &&
                         !(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120189 && handleInfo.Flags == SYSTEM_HANDLE_FLAGS.INHERIT) &&
@@ -775,6 +777,7 @@ namespace WalkmanLib
 
         #region CloseSystemHandle
 
+        // https://www.codeproject.com/Articles/18975/Listing-Used-Files
         /// <summary>Attempts to close a handle in a different process. Fails silently if the handle exists but could not be closed.</summary>
         /// <param name="ProcessID">Process ID of the process containing the handle to close</param>
         /// <param name="HandleID">Handle value in the target process to close</param>
