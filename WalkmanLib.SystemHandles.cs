@@ -5,6 +5,7 @@
 
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -586,7 +587,7 @@ namespace WalkmanLib
             public SYSTEM_HANDLE_TYPE Type;
         }
 
-        private static Dictionary<byte, string> rawTypeMap = new Dictionary<byte, string>();
+        private static ConcurrentDictionary<byte, string> rawTypeMap = new ConcurrentDictionary<byte, string>();
 
         private static SYSTEM_HANDLE_TYPE HandleTypeFromString(string typeString)
         {
@@ -724,7 +725,7 @@ namespace WalkmanLib
                         Marshal.FreeHGlobal(ptr);
                     }
 
-                    rawTypeMap[handleInfo.RawType] = handleInfo.TypeString;
+                    rawTypeMap.TryAdd(handleInfo.RawType, handleInfo.TypeString);
                     handleInfo.Type = HandleTypeFromString(handleInfo.TypeString);
                 }
 
