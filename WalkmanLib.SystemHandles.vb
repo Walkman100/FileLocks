@@ -538,7 +538,8 @@ Namespace WalkmanLib
                 Dim size As Integer = Marshal.SizeOf(GetType(SYSTEM_HANDLE))
 
                 For i As Integer = 0 To handleCount - 1
-                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(CType(CType(ptr, Integer) + offset, IntPtr))
+                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(ptr + offset)
+                    ' `ptr + offset` above was: `CType(CType(ptr, Integer) + offset, IntPtr)` but it seems to work...
                     Yield struc
 
                     offset += size
@@ -786,7 +787,7 @@ Namespace WalkmanLib
                     deviceName, 0,
                     networkDeviceQueryDosDevicePrefix, 0,
                     networkDeviceQueryDosDevicePrefix.Length, StringComparison.InvariantCulture) = 0 Then
-                Dim shareName As String = deviceName.Substring(deviceName.IndexOf("\", networkDeviceQueryDosDevicePrefix.Length) + 1)
+                Dim shareName As String = deviceName.Substring(deviceName.IndexOf("\"c, networkDeviceQueryDosDevicePrefix.Length) + 1)
                 Return String.Concat(networkDeviceSystemHandlePrefix, shareName)
             End If
             Return deviceName
@@ -832,9 +833,10 @@ Namespace WalkmanLib
             Dim i As Integer = devicePath.Length
 
             ' search in reverse, to catch network shares that are mapped before returning general network path
-            While i > 0 AndAlso (InlineAssignHelper(i, devicePath.LastIndexOf("\"C, i - 1))) <> -1
+            While i > 0 AndAlso devicePath.LastIndexOf("\"c, i - 1) <> -1
+                i = devicePath.LastIndexOf("\"c, i - 1)
                 Dim drive As String = ""
-                If deviceMap.TryGetValue(devicePath.Substring(0, i), drive) Then
+                If deviceMap.TryGetValue(devicePath.Remove(i), drive) Then
                     Return String.Concat(drive, devicePath.Substring(i))
                 End If
             End While
@@ -887,10 +889,6 @@ Namespace WalkmanLib
                 End Try
             Next
             Return processes
-        End Function
-        Private Shared Function InlineAssignHelper(Of T)(ByRef target As T, value As T) As T
-            target = value
-            Return value
         End Function
 
         #End Region
