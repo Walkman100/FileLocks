@@ -876,7 +876,7 @@ namespace WalkmanLib
             while (i > 0 && (i = devicePath.LastIndexOf('\\', i - 1)) != -1)
             {
                 string drive;
-                if (deviceMap.TryGetValue(devicePath.Substring(0, i), out drive))
+                if (deviceMap.TryGetValue(devicePath.Remove(i), out drive))
                     return string.Concat(drive, devicePath.Substring(i));
             }
             return devicePath;
