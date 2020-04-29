@@ -882,10 +882,10 @@ Namespace WalkmanLib
             Dim processes As New List(Of Process)()
             For Each handleInfo As HandleInfo In GetFileHandles(filePath)
                 Try
-                    Dim process__1 As Process = Process.GetProcessById(CInt(handleInfo.ProcessID))
-                    processes.Add(process__1)
-                ' process has exited
+                    Dim processToAdd As Process = Process.GetProcessById(CType(handleInfo.ProcessID, Integer))
+                    processes.Add(processToAdd)
                 Catch generatedExceptionName As ArgumentException
+                    ' process has exited
                 End Try
             Next
             Return processes
