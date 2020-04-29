@@ -103,13 +103,13 @@ Namespace WalkmanLib
                 
                 Dim resources As String() = { path } ' Just checking on one resource.
                 
-                If RmRegisterResources(handle, CUInt(resources.Length), resources, 0, Nothing, 0, Nothing) <> 0 Then
+                If RmRegisterResources(handle, CType(resources.Length, UInteger), resources, 0, Nothing, 0, Nothing) <> 0 Then
                     Throw New Exception("Could not register resource.", New Win32Exception())
                 End If
 
                 Select Case RmGetList(handle, ArrayLengthNeeded, ArrayLength, Nothing, lpdwRebootReasons)
                     Case ERROR_MORE_DATA
-                        Dim processInfos(CInt(ArrayLengthNeeded) - 1) As ProcessInfo
+                        Dim processInfos(CType(ArrayLengthNeeded, Integer) - 1) As ProcessInfo
                         ArrayLength = ArrayLengthNeeded
 
                         If RmGetList(handle, ArrayLengthNeeded, ArrayLength, processInfos, lpdwRebootReasons) <> 0 Then
@@ -131,7 +131,7 @@ Namespace WalkmanLib
             Dim processes As New List(Of Process)
             For Each pI As ProcessInfo In GetLockingProcessInfos(path)
                 Try
-                    Dim processToAdd As Process = Process.GetProcessById(CInt(pI.Process.ProcessID))
+                    Dim processToAdd As Process = Process.GetProcessById(CType(pI.Process.ProcessID, Integer))
                     processes.Add(processToAdd)
                 Catch ex As ArgumentException
                 End Try

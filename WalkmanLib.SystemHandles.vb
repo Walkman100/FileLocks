@@ -383,8 +383,8 @@ Namespace WalkmanLib
             Public ReadOnly Buffer As String
 
             Public Sub New(s As String)
-                Length = CUShort(s.Length * 2)
-                MaximumLength = CUShort(Length + 2)
+                Length = CType(s.Length * 2, UShort)
+                MaximumLength = CType(Length + 2, UShort)
                 Buffer = s
             End Sub
         End Structure
@@ -517,7 +517,7 @@ Namespace WalkmanLib
             Dim ptr As IntPtr = IntPtr.Zero
             Try
                 While True
-                    ptr = Marshal.AllocHGlobal(CInt(length))
+                    ptr = Marshal.AllocHGlobal(CType(length, Integer))
                     Dim wantedLength As UInteger
                     Select Case NtQuerySystemInformation(
                             SYSTEM_INFORMATION_CLASS.SystemHandleInformation,
@@ -533,12 +533,12 @@ Namespace WalkmanLib
                     End Select
                 End While
 
-                Dim handleCount As Integer = If(IntPtr.Size = 4, Marshal.ReadInt32(ptr), CInt(Marshal.ReadInt64(ptr)))
+                Dim handleCount As Integer = If(IntPtr.Size = 4, Marshal.ReadInt32(ptr), CType(Marshal.ReadInt64(ptr), Integer))
                 Dim offset As Integer = IntPtr.Size
                 Dim size As Integer = Marshal.SizeOf(GetType(SYSTEM_HANDLE))
 
                 For i As Integer = 0 To handleCount - 1
-                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(CType(CInt(ptr) + offset, IntPtr))
+                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(CType(CType(ptr, Integer) + offset, IntPtr))
                     Yield struc
 
                     offset += size
@@ -684,7 +684,7 @@ Namespace WalkmanLib
 
                     Dim ptr As IntPtr = IntPtr.Zero
                     Try
-                        ptr = Marshal.AllocHGlobal(CInt(length))
+                        ptr = Marshal.AllocHGlobal(CType(length, Integer))
                         If NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, length) <> NTSTATUS.STATUS_SUCCESS Then
                             Return handleInfo
                         End If
@@ -720,7 +720,7 @@ Namespace WalkmanLib
 
                     Dim ptr As IntPtr = IntPtr.Zero
                     Try
-                        ptr = Marshal.AllocHGlobal(CInt(length))
+                        ptr = Marshal.AllocHGlobal(CType(length, Integer))
                         If NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, length) <> NTSTATUS.STATUS_SUCCESS Then
                             Return handleInfo
                         End If
@@ -754,13 +754,13 @@ Namespace WalkmanLib
             Dim handleDuplicate As IntPtr = IntPtr.Zero
             Try
                 sourceProcessHandle = OpenProcess(PROCESS_ACCESS_RIGHTS.PROCESS_DUP_HANDLE, True, ProcessID)
-                If CInt(sourceProcessHandle) < 1 Then
+                If CType(sourceProcessHandle, Integer) < 1 Then
                     Throw New ArgumentException("Process ID Not Found!", "ProcessID", New Win32Exception())
                 End If
 
                 ' always returns false, no point in checking
                 DuplicateHandle(sourceProcessHandle, CType(HandleID, IntPtr), GetCurrentProcess(), handleDuplicate, 0, False, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_CLOSE_SOURCE)
-                If CInt(handleDuplicate) < 1 AndAlso Marshal.GetLastWin32Error() = 6 Then ' ERROR_INVALID_HANDLE: The handle is invalid.
+                If CType(handleDuplicate, Integer) < 1 AndAlso Marshal.GetLastWin32Error() = 6 Then ' ERROR_INVALID_HANDLE: The handle is invalid.
                     Throw New ArgumentException("Handle ID Not Found!", "HandleID", New Win32Exception(6))
                 End If
             Finally
