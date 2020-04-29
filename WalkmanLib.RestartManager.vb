@@ -14,35 +14,33 @@ Imports System.ComponentModel
 
 Namespace WalkmanLib
     Public NotInheritable Class RestartManager
-        Private Sub New()
-        End Sub
         Const CCH_RM_MAX_APP_NAME As Integer = 255
         Const CCH_RM_MAX_SVC_NAME As Integer = 63
         Const ERROR_MORE_DATA As Integer = 234
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_process_info
-        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)> _
+        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)>
         Public Structure ProcessInfo
             Public Process As UniqueProcess
 
-            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_APP_NAME + 1)> _
+            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_APP_NAME + 1)>
             Public AppName As String
 
-            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_SVC_NAME + 1)> _
+            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_SVC_NAME + 1)>
             Public ServiceShortName As String
 
             Public ApplicationType As AppType
             Public AppStatus As UInteger
             Public TSSessionId As UInteger
-            <MarshalAs(UnmanagedType.Bool)> _
+            <MarshalAs(UnmanagedType.Bool)>
             Public Restartable As Boolean
         End Structure
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_unique_process
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Public Structure UniqueProcess
             Public ProcessID As UInteger
-            Private ProcessStartTime As System.Runtime.InteropServices.ComTypes.FILETIME
+            Private ProcessStartTime As ComTypes.FILETIME
         End Structure
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ne-restartmanager-rm_app_type
@@ -58,24 +56,38 @@ Namespace WalkmanLib
         End Enum
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmregisterresources
-        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Unicode)> _
-        Private Shared Function RmRegisterResources(pSessionHandle As UInteger, nFiles As UInteger, rgsFilenames As String(), nApplications As UInteger, <[In]> rgApplications As UniqueProcess(), nServices As UInteger, _
-            rgsServiceNames As String()) As Integer
+        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Unicode)>
+        Private Shared Function RmRegisterResources(pSessionHandle As UInteger,
+                                                    nFiles As UInteger,
+                                                    rgsFilenames As String(),
+                                                    nApplications As UInteger,
+                                                    <[In]> rgApplications As UniqueProcess(),
+                                                    nServices As UInteger,
+                                                    rgsServiceNames As String()
+        ) As Integer
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmstartsession
-        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Auto)> _
-        Private Shared Function RmStartSession(ByRef pSessionHandle As UInteger, dwSessionFlags As Integer, strSessionKey As String) As Integer
+        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Auto)>
+        Private Shared Function RmStartSession(ByRef pSessionHandle As UInteger,
+                                               dwSessionFlags As Integer,
+                                               strSessionKey As String
+        ) As Integer
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmendsession
-        <DllImport("rstrtmgr.dll", SetLastError := True)> _
+        <DllImport("rstrtmgr.dll", SetLastError := True)>
         Private Shared Function RmEndSession(pSessionHandle As UInteger) As Integer
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetlist
-        <DllImport("rstrtmgr.dll", SetLastError := True)> _
-        Private Shared Function RmGetList(dwSessionHandle As UInteger, ByRef pnProcInfoNeeded As UInteger, ByRef pnProcInfo As UInteger, <[In], Out> rgAffectedApps As ProcessInfo(), ByRef lpdwRebootReasons As UInteger) As Integer
+        <DllImport("rstrtmgr.dll", SetLastError := True)>
+        Private Shared Function RmGetList(dwSessionHandle As UInteger,
+                                          ByRef pnProcInfoNeeded As UInteger,
+                                          ByRef pnProcInfo As UInteger,
+                                          <[In], Out> rgAffectedApps As ProcessInfo(),
+                                          ByRef lpdwRebootReasons As UInteger
+        ) As Integer
         End Function
 
         Public Shared Function GetLockingProcessInfos(path As String) As ProcessInfo()
@@ -85,14 +97,13 @@ Namespace WalkmanLib
             End If
 
             Try
-                Dim ArrayLengthNeeded As UInteger = 0, ArrayLength As UInteger = 0, lpdwRebootReasons As UInteger = 0
-                'RmRebootReasonNone;
+                Dim ArrayLengthNeeded As UInteger = 0,
+                    ArrayLength As UInteger = 0,
+                    lpdwRebootReasons As UInteger = 0 'RmRebootReasonNone
                 
-                Dim resources As String() = {path}
-                ' Just checking on one resource.
+                Dim resources As String() = { path } ' Just checking on one resource.
                 
-                If RmRegisterResources(handle, CUInt(resources.Length), resources, 0, Nothing, 0, _
-                    Nothing) <> 0 Then
+                If RmRegisterResources(handle, CUInt(resources.Length), resources, 0, Nothing, 0, Nothing) <> 0 Then
                     Throw New Exception("Could not register resource.", New Win32Exception())
                 End If
 
@@ -117,7 +128,7 @@ Namespace WalkmanLib
         End Function
 
         Public Shared Function GetLockingProcesses(path As String) As List(Of Process)
-            Dim processes As New List(Of Process)()
+            Dim processes As New List(Of Process)
             For Each pI As ProcessInfo In GetLockingProcessInfos(path)
                 Try
                     Dim process__1 As Process = Process.GetProcessById(CInt(pI.Process.ProcessID))

@@ -275,7 +275,7 @@ Namespace WalkmanLib
             STANDARD_RIGHTS_REQUIRED = &Hf0000
             SYNCHRONIZE = &H100000
 
-            PROCESS_ALL_ACCESS = STANDARD_RIGHTS_REQUIRED Or SYNCHRONIZE Or &Hffff
+            PROCESS_ALL_ACCESS = STANDARD_RIGHTS_REQUIRED Or SYNCHRONIZE Or &HFFFF
         End Enum
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle#DUPLICATE_CLOSE_SOURCE
@@ -344,7 +344,7 @@ Namespace WalkmanLib
         #Region "Structs"
 
         'https://www.codeproject.com/script/Articles/ViewDownloads.aspx?aid=18975&zep=OpenedFileFinder%2fUtils.h&rzp=%2fKB%2fshell%2fOpenedFileFinder%2f%2fopenedfilefinder_src.zip
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Protected Structure SYSTEM_HANDLE_INFORMATION
             'public IntPtr dwCount;
             Public dwCount As UInteger
@@ -357,7 +357,7 @@ Namespace WalkmanLib
 
         'https://stackoverflow.com/a/5163277/2999220
         'http://www.jasinskionline.com/TechnicalWiki/SYSTEM_HANDLE_INFORMATION-WinApi-Struct.ashx
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Friend Structure SYSTEM_HANDLE
             ''' <summary>Handle Owner Process ID</summary>
             Public dwProcessId As UInteger
@@ -375,7 +375,7 @@ Namespace WalkmanLib
 
         'https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
         'https://www.pinvoke.net/default.aspx/Structures/UNICODE_STRING.html
-        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)> _
+        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)>
         Protected Structure UNICODE_STRING
             Public ReadOnly Length As UShort
             Public ReadOnly MaximumLength As UShort
@@ -391,7 +391,7 @@ Namespace WalkmanLib
 
         'https://www.pinvoke.net/default.aspx/Structures.GENERIC_MAPPING
         'http://www.jasinskionline.com/technicalwiki/GENERIC_MAPPING-WinApi-Struct.ashx
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Protected Structure GENERIC_MAPPING
             Public GenericRead As UInteger
             Public GenericWrite As UInteger
@@ -400,14 +400,14 @@ Namespace WalkmanLib
         End Structure
 
         'http://www.jasinskionline.com/technicalwiki/OBJECT_NAME_INFORMATION-WinApi-Struct.ashx
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Protected Structure OBJECT_NAME_INFORMATION
             Public Name As UNICODE_STRING
         End Structure
 
         'https://docs.microsoft.com/en-za/windows-hardware/drivers/ddi/ntifs/ns-ntifs-__public_object_type_information
         'http://www.jasinskionline.com/technicalwiki/OBJECT_TYPE_INFORMATION-WinApi-Struct.ashx
-        <StructLayout(LayoutKind.Sequential)> _
+        <StructLayout(LayoutKind.Sequential)>
         Protected Structure OBJECT_TYPE_INFORMATION
             Public TypeName As UNICODE_STRING
             Public ObjectCount As Integer
@@ -437,41 +437,69 @@ Namespace WalkmanLib
         #Region "Methods"
 
         'https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation
-        <DllImport("ntdll.dll")> _
-        Protected Shared Function NtQuerySystemInformation(<[In]> SystemInformationClass As SYSTEM_INFORMATION_CLASS, <Out> SystemInformation As IntPtr, <[In]> SystemInformationLength As UInteger, <Out> ByRef ReturnLength As UInteger) As NTSTATUS
+        <DllImport("ntdll.dll")>
+        Protected Shared Function NtQuerySystemInformation(
+            <[In]> SystemInformationClass As SYSTEM_INFORMATION_CLASS,
+            <Out>  SystemInformation As IntPtr,
+            <[In]> SystemInformationLength As UInteger,
+            <Out>  ByRef ReturnLength As UInteger
+                ) As NTSTATUS
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
-        <DllImport("ntdll.dll")> _
-        Protected Shared Function NtQueryObject(<[In]> Handle As IntPtr, <[In]> ObjectInformationClass As OBJECT_INFORMATION_CLASS, <[In]> ObjectInformation As IntPtr, <[In]> ObjectInformationLength As UInteger, <Out> ByRef ReturnLength As UInteger) As NTSTATUS
+        <DllImport("ntdll.dll")>
+        Protected Shared Function NtQueryObject(
+            <[In]> Handle As IntPtr,
+            <[In]> ObjectInformationClass As OBJECT_INFORMATION_CLASS,
+            <[In]> ObjectInformation As IntPtr,
+            <[In]> ObjectInformationLength As UInteger,
+            <Out>  ByRef ReturnLength As UInteger
+                ) As NTSTATUS
         End Function
 
         'https://docs.microsoft.com/en-za/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
-        <DllImport("kernel32.dll", SetLastError := True)> _
-        Protected Shared Function OpenProcess(<[In]> dwDesiredAccess As PROCESS_ACCESS_RIGHTS, <[In], MarshalAs(UnmanagedType.Bool)> bInheritHandle As Boolean, <[In]> dwProcessId As UInteger) As IntPtr
+        <DllImport("kernel32.dll", SetLastError := True)>
+        Protected Shared Function OpenProcess(
+            <[In]> dwDesiredAccess As PROCESS_ACCESS_RIGHTS,
+            <[In], MarshalAs(UnmanagedType.Bool)> bInheritHandle As Boolean,
+            <[In]> dwProcessId As UInteger
+                ) As IntPtr
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle
-        <DllImport("kernel32.dll", SetLastError := True)> _
-        Protected Shared Function DuplicateHandle(<[In]> hSourceProcessHandle As IntPtr, <[In]> hSourceHandle As IntPtr, <[In]> hTargetProcessHandle As IntPtr, <Out> ByRef lpTargetHandle As IntPtr, <[In]> dwDesiredAccess As UInteger, <[In], MarshalAs(UnmanagedType.Bool)> bInheritHandle As Boolean, _
-        	<[In]> dwOptions As DUPLICATE_HANDLE_OPTIONS) As <MarshalAs(UnmanagedType.Bool)> Boolean
+        <DllImport("kernel32.dll", SetLastError := True)>
+        Protected Shared Function DuplicateHandle(
+            <[In]> hSourceProcessHandle As IntPtr,
+            <[In]> hSourceHandle As IntPtr,
+            <[In]> hTargetProcessHandle As IntPtr,
+            <Out>  ByRef lpTargetHandle As IntPtr,
+            <[In]> dwDesiredAccess As UInteger,
+            <[In], MarshalAs(UnmanagedType.Bool)> bInheritHandle As Boolean,
+            <[In]> dwOptions As DUPLICATE_HANDLE_OPTIONS
+                ) As <MarshalAs(UnmanagedType.Bool)> Boolean
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess
-        <DllImport("kernel32.dll")> _
+        <DllImport("kernel32.dll")>
         Protected Shared Function GetCurrentProcess() As IntPtr
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
-        <ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)> _
-        <DllImport("kernel32.dll", SetLastError := True)> _
-        Protected Shared Function CloseHandle(<[In]> hObject As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+        <ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)>
+        <DllImport("kernel32.dll", SetLastError := True)>
+        Protected Shared Function CloseHandle(
+            <[In]> hObject As IntPtr
+                ) As <MarshalAs(UnmanagedType.Bool)> Boolean
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-querydosdevicea
         'https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
-        <DllImport("kernel32.dll", SetLastError := True)> _
-        Protected Shared Function QueryDosDevice(<[In]> lpDeviceName As String, <Out> lpTargetPath As StringBuilder, <[In]> ucchMax As UInteger) As UInteger
+        <DllImport("kernel32.dll", SetLastError := True)>
+        Protected Shared Function QueryDosDevice(
+            <[In]> lpDeviceName As String,
+            <Out>  lpTargetPath As StringBuilder,
+            <[In]> ucchMax As UInteger
+                ) As UInteger
         End Function
 
         #End Region
@@ -492,7 +520,9 @@ Namespace WalkmanLib
                 While Not done
                     ptr = Marshal.AllocHGlobal(CInt(length))
                     Dim wantedLength As UInteger
-                    Select Case NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, wantedLength)
+                    Select Case NtQuerySystemInformation(
+                            SYSTEM_INFORMATION_CLASS.SystemHandleInformation,
+                            ptr, length, wantedLength)
                         Case NTSTATUS.STATUS_SUCCESS
                             done = True
                             ' can't double-break in C#
@@ -623,15 +653,15 @@ Namespace WalkmanLib
         ''' <param name="onlyGetNameFor">Set this to only attempt to get Handle names for a specific handle type. Set to int.MaxValue to disable getting file names.</param>
         ''' <returns>HandleInfo struct with retrievable information populated.</returns>
         Friend Shared Function GetHandleInfo(handle As SYSTEM_HANDLE, Optional getAllNames As Boolean = False, Optional onlyGetNameFor As SYSTEM_HANDLE_TYPE = SYSTEM_HANDLE_TYPE.UNKNOWN) As HandleInfo
-            Dim handleInfo As New HandleInfo() With { _
-                Key .ProcessID = handle.dwProcessId, _
-                Key .HandleID = handle.wValue, _
-                Key .GrantedAccess = handle.dwGrantedAccess, _
-                Key .RawType = handle.bObjectType, _
-                Key .Flags = handle.bFlags, _
-                Key .Name = Nothing, _
-                Key .TypeString = Nothing, _
-                Key .Type = SYSTEM_HANDLE_TYPE.UNKNOWN _
+            Dim handleInfo As New HandleInfo() With {
+                .ProcessID = handle.dwProcessId,
+                .HandleID = handle.wValue,
+                .GrantedAccess = handle.dwGrantedAccess,
+                .RawType = handle.bObjectType,
+                .Flags = handle.bFlags,
+                .Name = Nothing,
+                .TypeString = Nothing,
+                .Type = SYSTEM_HANDLE_TYPE.UNKNOWN
             }
 
             ' get type from cached map if it exists
@@ -647,8 +677,7 @@ Namespace WalkmanLib
 
                 ' To read info about a handle owned by another process we must duplicate it into ours
                 ' For simplicity, current process handles will also get duplicated; remember that process handles cannot be compared for equality
-                If Not DuplicateHandle(sourceProcessHandle, CType(handleInfo.HandleID, IntPtr), GetCurrentProcess(), handleDuplicate, 0, False, _
-                    DUPLICATE_HANDLE_OPTIONS.DUPLICATE_SAME_ACCESS) Then
+                If Not DuplicateHandle(sourceProcessHandle, CType(handleInfo.HandleID, IntPtr), GetCurrentProcess(), handleDuplicate, 0, False, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_SAME_ACCESS) Then
                     Return handleInfo
                 End If
 
@@ -675,11 +704,21 @@ Namespace WalkmanLib
                 End If
 
                 ' Get the object name
-                ' only check onlyGetNameFor if it isn't UNKNOWN
-                ' this type can hang for ~15 mins, but excluding it cuts a lot of results, and it does eventually resolve...
+                '     only check onlyGetNameFor if it isn't UNKNOWN
+                '         this type can hang for ~15 mins, but excluding it cuts a lot of results, and it does eventually resolve...
                 '!(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == 0x00                       ) &&
-                If handleInfo.TypeString IsNot Nothing AndAlso (onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN OrElse handleInfo.Type = onlyGetNameFor) AndAlso (getAllNames = True OrElse ( Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1f01ff AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120089 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = &H00                       ) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = &H00                       ) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = &H00                       ) AndAlso Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT))) Then
-                    ' don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
+                If (handleInfo.TypeString IsNot Nothing AndAlso
+                    (onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN OrElse handleInfo.Type = onlyGetNameFor) AndAlso
+                    (getAllNames = True OrElse (
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1f01ff AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120089 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = &H00                       ) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = &H00                       ) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = &H00                       ) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT)
+                            ))) Then ' don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
                     Dim length As UInteger
                     NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, length)
 
@@ -724,10 +763,8 @@ Namespace WalkmanLib
                 End If
 
                 ' always returns false, no point in checking
-                DuplicateHandle(sourceProcessHandle, CType(HandleID, IntPtr), GetCurrentProcess(), handleDuplicate, 0, False, _
-                    DUPLICATE_HANDLE_OPTIONS.DUPLICATE_CLOSE_SOURCE)
-                If CInt(handleDuplicate) < 1 AndAlso Marshal.GetLastWin32Error() = 6 Then
-                    ' ERROR_INVALID_HANDLE: The handle is invalid.
+                DuplicateHandle(sourceProcessHandle, CType(HandleID, IntPtr), GetCurrentProcess(), handleDuplicate, 0, False, DUPLICATE_HANDLE_OPTIONS.DUPLICATE_CLOSE_SOURCE)
+                If CInt(handleDuplicate) < 1 AndAlso Marshal.GetLastWin32Error() = 6 Then ' ERROR_INVALID_HANDLE: The handle is invalid.
                     Throw New ArgumentException("Handle ID Not Found!", "HandleID", New Win32Exception(6))
                 End If
             Finally
@@ -749,7 +786,10 @@ Namespace WalkmanLib
 
         Private Shared Function NormalizeDeviceName(deviceName As String) As String
             ' if deviceName.StartsWith(networkDeviceQueryDosDevicePrefix)
-            If String.Compare(deviceName, 0, networkDeviceQueryDosDevicePrefix, 0, networkDeviceQueryDosDevicePrefix.Length, StringComparison.InvariantCulture) = 0 Then
+            If String.Compare(
+                    deviceName, 0,
+                    networkDeviceQueryDosDevicePrefix, 0,
+                    networkDeviceQueryDosDevicePrefix.Length, StringComparison.InvariantCulture) = 0 Then
                 Dim shareName As String = deviceName.Substring(deviceName.IndexOf("\"C, networkDeviceQueryDosDevicePrefix.Length) + 1)
                 Return String.Concat(networkDeviceSystemHandlePrefix, shareName)
             End If
@@ -766,11 +806,15 @@ Namespace WalkmanLib
 
                 QueryDosDevice(lpDeviceName, lpTargetPath, MAX_PATH)
 
-                localDeviceMap.Add(NormalizeDeviceName(lpTargetPath.ToString()), lpDeviceName)
+                localDeviceMap.Add(
+                    NormalizeDeviceName(lpTargetPath.ToString()),
+                    lpDeviceName)
             Next
             ' add a map so \\COMPUTER\ shares get picked up correctly - these will come as \Device\Mup\COMPUTER\share
-            ' remove the last slash from networkDeviceSystemHandlePrefix:
-            localDeviceMap.Add(networkDeviceSystemHandlePrefix.Substring(0, networkDeviceSystemHandlePrefix.Length - 1), "\")
+            '     remove the last slash from networkDeviceSystemHandlePrefix:
+            localDeviceMap.Add(
+                networkDeviceSystemHandlePrefix.Substring(0, networkDeviceSystemHandlePrefix.Length - 1),
+                "\")
             Return localDeviceMap
         End Function
 
