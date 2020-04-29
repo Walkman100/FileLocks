@@ -515,23 +515,19 @@ Namespace WalkmanLib
         Friend Shared Iterator Function GetSystemHandles() As IEnumerable(Of SYSTEM_HANDLE)
             Dim length As UInteger = &H1000
             Dim ptr As IntPtr = IntPtr.Zero
-            Dim done As Boolean = False
             Try
-                While Not done
+                While True
                     ptr = Marshal.AllocHGlobal(CInt(length))
                     Dim wantedLength As UInteger
                     Select Case NtQuerySystemInformation(
                             SYSTEM_INFORMATION_CLASS.SystemHandleInformation,
                             ptr, length, wantedLength)
                         Case NTSTATUS.STATUS_SUCCESS
-                            done = True
-                            ' can't double-break in C#
-                            Exit Select
+                            Exit While
                         Case NTSTATUS.STATUS_INFO_LENGTH_MISMATCH
                             length = Math.Max(length, wantedLength)
                             Marshal.FreeHGlobal(ptr)
                             ptr = IntPtr.Zero
-                            Exit Select
                         Case Else
                             Throw New Exception("Failed to retrieve system handle information.", New Win32Exception())
                     End Select

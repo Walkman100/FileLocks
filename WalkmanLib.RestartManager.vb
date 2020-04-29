@@ -109,7 +109,7 @@ Namespace WalkmanLib
 
                 Select Case RmGetList(handle, ArrayLengthNeeded, ArrayLength, Nothing, lpdwRebootReasons)
                     Case ERROR_MORE_DATA
-                        Dim processInfos As ProcessInfo() = New ProcessInfo(ArrayLengthNeeded - 1) {}
+                        Dim processInfos(CInt(ArrayLengthNeeded) - 1) As ProcessInfo
                         ArrayLength = ArrayLengthNeeded
 
                         If RmGetList(handle, ArrayLengthNeeded, ArrayLength, processInfos, lpdwRebootReasons) <> 0 Then
@@ -118,7 +118,7 @@ Namespace WalkmanLib
 
                         Return processInfos
                     Case 0
-                        Return New ProcessInfo(-1) {}
+                        Return New ProcessInfo() { }
                     Case Else
                         Throw New Exception("Could not list processes locking resource. Failed to get size of result.", New Win32Exception())
                 End Select
@@ -131,9 +131,9 @@ Namespace WalkmanLib
             Dim processes As New List(Of Process)
             For Each pI As ProcessInfo In GetLockingProcessInfos(path)
                 Try
-                    Dim process__1 As Process = Process.GetProcessById(CInt(pI.Process.ProcessID))
-                    processes.Add(process__1)
-                Catch generatedExceptionName As ArgumentException
+                    Dim processToAdd As Process = Process.GetProcessById(CInt(pI.Process.ProcessID))
+                    processes.Add(processToAdd)
+                Catch ex As ArgumentException
                 End Try
             Next
             Return processes
