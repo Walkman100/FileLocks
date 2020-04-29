@@ -346,12 +346,12 @@ Namespace WalkmanLib
         'https://www.codeproject.com/script/Articles/ViewDownloads.aspx?aid=18975&zep=OpenedFileFinder%2fUtils.h&rzp=%2fKB%2fshell%2fOpenedFileFinder%2f%2fopenedfilefinder_src.zip
         <StructLayout(LayoutKind.Sequential)>
         Protected Structure SYSTEM_HANDLE_INFORMATION
-            'public IntPtr dwCount;
+            'Public dwCount As IntPtr
             Public dwCount As UInteger
 
             ' see https://stackoverflow.com/a/38884095/2999220 - MarshalAs doesn't allow variable sized arrays
-            '[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct)]
-            'public SYSTEM_HANDLE[] Handles;
+            '<MarshalAs(UnmanagedType.ByValArray, ArraySubType := UnmanagedType.Struct)>
+            'Public [Handles] As SYSTEM_HANDLE()
             Public [Handles] As IntPtr
         End Structure
 
@@ -512,7 +512,7 @@ Namespace WalkmanLib
 
         ''' <summary>Gets all the open handles on the system. Use GetHandleInfo to retrieve proper type and name information.</summary>
         ''' <returns>Enumerable list of system handles</returns>
-        Friend Shared Function GetSystemHandles() As IEnumerable(Of SYSTEM_HANDLE)
+        Friend Shared Iterator Function GetSystemHandles() As IEnumerable(Of SYSTEM_HANDLE)
             Dim length As UInteger = &H1000
             Dim ptr As IntPtr = IntPtr.Zero
             Dim done As Boolean = False
@@ -543,7 +543,7 @@ Namespace WalkmanLib
 
                 For i As Integer = 0 To handleCount - 1
                     Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(CType(CInt(ptr) + offset, IntPtr))
-                    yield Return struc
+                    Yield struc
 
                     offset += size
                 Next
@@ -706,7 +706,7 @@ Namespace WalkmanLib
                 ' Get the object name
                 '     only check onlyGetNameFor if it isn't UNKNOWN
                 '         this type can hang for ~15 mins, but excluding it cuts a lot of results, and it does eventually resolve...
-                '!(handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.GrantedAccess == 0x120089 && handleInfo.Flags == 0x00                       ) &&
+                '        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120089 AndAlso handleInfo.Flags = &H00                       ) AndAlso
                 If (handleInfo.TypeString IsNot Nothing AndAlso
                     (onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN OrElse handleInfo.Type = onlyGetNameFor) AndAlso
                     (getAllNames = True OrElse (
@@ -785,12 +785,12 @@ Namespace WalkmanLib
         Private Const MAX_PATH As Integer = 260
 
         Private Shared Function NormalizeDeviceName(deviceName As String) As String
-            ' if deviceName.StartsWith(networkDeviceQueryDosDevicePrefix)
+            ' If deviceName.StartsWith(networkDeviceQueryDosDevicePrefix)
             If String.Compare(
                     deviceName, 0,
                     networkDeviceQueryDosDevicePrefix, 0,
                     networkDeviceQueryDosDevicePrefix.Length, StringComparison.InvariantCulture) = 0 Then
-                Dim shareName As String = deviceName.Substring(deviceName.IndexOf("\"C, networkDeviceQueryDosDevicePrefix.Length) + 1)
+                Dim shareName As String = deviceName.Substring(deviceName.IndexOf("\", networkDeviceQueryDosDevicePrefix.Length) + 1)
                 Return String.Concat(networkDeviceSystemHandlePrefix, shareName)
             End If
             Return deviceName
@@ -837,7 +837,7 @@ Namespace WalkmanLib
 
             ' search in reverse, to catch network shares that are mapped before returning general network path
             While i > 0 AndAlso (InlineAssignHelper(i, devicePath.LastIndexOf("\"C, i - 1))) <> -1
-                Dim drive As String
+                Dim drive As String = ""
                 If deviceMap.TryGetValue(devicePath.Substring(0, i), drive) Then
                     Return String.Concat(drive, devicePath.Substring(i))
                 End If
@@ -855,7 +855,7 @@ Namespace WalkmanLib
         ''' </summary>
         ''' <param name="filePath">Path to look for handles to.</param>
         ''' <returns>Enumerable list of handles matching <paramref name="filePath"/></returns>
-        Friend Shared Function GetFileHandles(filePath As String) As IEnumerable(Of HandleInfo)
+        Friend Shared Iterator Function GetFileHandles(filePath As String) As IEnumerable(Of HandleInfo)
             If File.Exists(filePath) Then
                 filePath = New FileInfo(filePath).FullName
             ElseIf Directory.Exists(filePath) Then
@@ -867,7 +867,7 @@ Namespace WalkmanLib
                 If handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.Name IsNot Nothing Then
                     handleInfo.Name = ConvertDevicePathToDosPath(handleInfo.Name)
                     If handleInfo.Name.Contains(filePath) Then
-                        yield Return handleInfo
+                        Yield handleInfo
                     End If
                 End If
             Next
