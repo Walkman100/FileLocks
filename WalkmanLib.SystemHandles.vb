@@ -23,303 +23,303 @@ Namespace WalkmanLib
         'https://pinvoke.net/default.aspx/Enums.NtStatus
         'https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55
         Protected Enum NTSTATUS As UInteger
-            STATUS_SUCCESS = &H0
-            STATUS_BUFFER_OVERFLOW = &H80000005UI
+            STATUS_SUCCESS =              &H0
+            STATUS_BUFFER_OVERFLOW =      &H80000005UI
             STATUS_INFO_LENGTH_MISMATCH = &HC0000004UI
         End Enum
 
         'https://www.pinvoke.net/default.aspx/ntdll/SYSTEM_INFORMATION_CLASS.html
         Protected Enum SYSTEM_INFORMATION_CLASS
-            SystemBasicInformation = &H0
-            SystemProcessorInformation = &H1
-            SystemPerformanceInformation = &H2
-            SystemTimeOfDayInformation = &H3
-            SystemPathInformation = &H4
-            SystemProcessInformation = &H5
-            SystemCallCountInformation = &H6
-            SystemDeviceInformation = &H7
-            SystemProcessorPerformanceInformation = &H8
-            SystemFlagsInformation = &H9
-            SystemCallTimeInformation = &HA
-            SystemModuleInformation = &HB
-            SystemLocksInformation = &HC
-            SystemStackTraceInformation = &HD
-            SystemPagedPoolInformation = &HE
-            SystemNonPagedPoolInformation = &HF
-            SystemHandleInformation = &H10
-            SystemObjectInformation = &H11
-            SystemPageFileInformation = &H12
-            SystemVdmInstemulInformation = &H13
-            SystemVdmBopInformation = &H14
-            SystemFileCacheInformation = &H15
-            SystemPoolTagInformation = &H16
-            SystemInterruptInformation = &H17
-            SystemDpcBehaviorInformation = &H18
-            SystemFullMemoryInformation = &H19
-            SystemLoadGdiDriverInformation = &H1A
-            SystemUnloadGdiDriverInformation = &H1B
-            SystemTimeAdjustmentInformation = &H1C
-            SystemSummaryMemoryInformation = &H1D
-            SystemMirrorMemoryInformation = &H1E
-            SystemPerformanceTraceInformation = &H1F
-            SystemObsolete0 = &H20
-            SystemExceptionInformation = &H21
-            SystemCrashDumpStateInformation = &H22
-            SystemKernelDebuggerInformation = &H23
-            SystemContextSwitchInformation = &H24
-            SystemRegistryQuotaInformation = &H25
-            SystemExtendServiceTableInformation = &H26
-            SystemPrioritySeperation = &H27
-            SystemVerifierAddDriverInformation = &H28
-            SystemVerifierRemoveDriverInformation = &H29
-            SystemProcessorIdleInformation = &H2A
-            SystemLegacyDriverInformation = &H2B
-            SystemCurrentTimeZoneInformation = &H2C
-            SystemLookasideInformation = &H2D
-            SystemTimeSlipNotification = &H2E
-            SystemSessionCreate = &H2F
-            SystemSessionDetach = &H30
-            SystemSessionInformation = &H31
-            SystemRangeStartInformation = &H32
-            SystemVerifierInformation = &H33
-            SystemVerifierThunkExtend = &H34
-            SystemSessionProcessInformation = &H35
-            SystemLoadGdiDriverInSystemSpace = &H36
-            SystemNumaProcessorMap = &H37
-            SystemPrefetcherInformation = &H38
-            SystemExtendedProcessInformation = &H39
-            SystemRecommendedSharedDataAlignment = &H3A
-            SystemComPlusPackage = &H3B
-            SystemNumaAvailableMemory = &H3C
-            SystemProcessorPowerInformation = &H3D
-            SystemEmulationBasicInformation = &H3E
-            SystemEmulationProcessorInformation = &H3F
-            SystemExtendedHandleInformation = &H40
-            SystemLostDelayedWriteInformation = &H41
-            SystemBigPoolInformation = &H42
-            SystemSessionPoolTagInformation = &H43
-            SystemSessionMappedViewInformation = &H44
-            SystemHotpatchInformation = &H45
-            SystemObjectSecurityMode = &H46
-            SystemWatchdogTimerHandler = &H47
-            SystemWatchdogTimerInformation = &H48
-            SystemLogicalProcessorInformation = &H49
-            SystemWow64SharedInformationObsolete = &H4A
-            SystemRegisterFirmwareTableInformationHandler = &H4B
-            SystemFirmwareTableInformation = &H4C
-            SystemModuleInformationEx = &H4D
-            SystemVerifierTriageInformation = &H4E
-            SystemSuperfetchInformation = &H4F
-            SystemMemoryListInformation = &H50
-            SystemFileCacheInformationEx = &H51
-            SystemThreadPriorityClientIdInformation = &H52
-            SystemProcessorIdleCycleTimeInformation = &H53
-            SystemVerifierCancellationInformation = &H54
-            SystemProcessorPowerInformationEx = &H55
-            SystemRefTraceInformation = &H56
-            SystemSpecialPoolInformation = &H57
-            SystemProcessIdInformation = &H58
-            SystemErrorPortInformation = &H59
-            SystemBootEnvironmentInformation = &H5A
-            SystemHypervisorInformation = &H5B
-            SystemVerifierInformationEx = &H5C
-            SystemTimeZoneInformation = &H5D
-            SystemImageFileExecutionOptionsInformation = &H5E
-            SystemCoverageInformation = &H5F
-            SystemPrefetchPatchInformation = &H60
-            SystemVerifierFaultsInformation = &H61
-            SystemSystemPartitionInformation = &H62
-            SystemSystemDiskInformation = &H63
-            SystemProcessorPerformanceDistribution = &H64
-            SystemNumaProximityNodeInformation = &H65
-            SystemDynamicTimeZoneInformation = &H66
-            SystemCodeIntegrityInformation = &H67
-            SystemProcessorMicrocodeUpdateInformation = &H68
-            SystemProcessorBrandString = &H69
-            SystemVirtualAddressInformation = &H6A
-            SystemLogicalProcessorAndGroupInformation = &H6B
-            SystemProcessorCycleTimeInformation = &H6C
-            SystemStoreInformation = &H6D
-            SystemRegistryAppendString = &H6E
-            SystemAitSamplingValue = &H6F
-            SystemVhdBootInformation = &H70
-            SystemCpuQuotaInformation = &H71
-            SystemNativeBasicInformation = &H72
-            SystemErrorPortTimeouts = &H73
-            SystemLowPriorityIoInformation = &H74
-            SystemBootEntropyInformation = &H75
-            SystemVerifierCountersInformation = &H76
-            SystemPagedPoolInformationEx = &H77
-            SystemSystemPtesInformationEx = &H78
-            SystemNodeDistanceInformation = &H79
-            SystemAcpiAuditInformation = &H7A
-            SystemBasicPerformanceInformation = &H7B
-            SystemQueryPerformanceCounterInformation = &H7C
-            SystemSessionBigPoolInformation = &H7D
-            SystemBootGraphicsInformation = &H7E
-            SystemScrubPhysicalMemoryInformation = &H7F
-            SystemBadPageInformation = &H80
-            SystemProcessorProfileControlArea = &H81
-            SystemCombinePhysicalMemoryInformation = &H82
-            SystemEntropyInterruptTimingInformation = &H83
-            SystemConsoleInformation = &H84
-            SystemPlatformBinaryInformation = &H85
-            SystemPolicyInformation = &H86
-            SystemHypervisorProcessorCountInformation = &H87
-            SystemDeviceDataInformation = &H88
-            SystemDeviceDataEnumerationInformation = &H89
-            SystemMemoryTopologyInformation = &H8A
-            SystemMemoryChannelInformation = &H8B
-            SystemBootLogoInformation = &H8C
-            SystemProcessorPerformanceInformationEx = &H8D
-            SystemCriticalProcessErrorLogInformation = &H8E
-            SystemSecureBootPolicyInformation = &H8F
-            SystemPageFileInformationEx = &H90
-            SystemSecureBootInformation = &H91
-            SystemEntropyInterruptTimingRawInformation = &H92
-            SystemPortableWorkspaceEfiLauncherInformation = &H93
-            SystemFullProcessInformation = &H94
-            SystemKernelDebuggerInformationEx = &H95
-            SystemBootMetadataInformation = &H96
-            SystemSoftRebootInformation = &H97
-            SystemElamCertificateInformation = &H98
-            SystemOfflineDumpConfigInformation = &H99
-            SystemProcessorFeaturesInformation = &H9A
-            SystemRegistryReconciliationInformation = &H9B
-            SystemEdidInformation = &H9C
-            SystemManufacturingInformation = &H9D
-            SystemEnergyEstimationConfigInformation = &H9E
-            SystemHypervisorDetailInformation = &H9F
-            SystemProcessorCycleStatsInformation = &HA0
-            SystemVmGenerationCountInformation = &HA1
-            SystemTrustedPlatformModuleInformation = &HA2
-            SystemKernelDebuggerFlags = &HA3
-            SystemCodeIntegrityPolicyInformation = &HA4
-            SystemIsolatedUserModeInformation = &HA5
+            SystemBasicInformation =                                &H0
+            SystemProcessorInformation =                            &H1
+            SystemPerformanceInformation =                          &H2
+            SystemTimeOfDayInformation =                            &H3
+            SystemPathInformation =                                 &H4
+            SystemProcessInformation =                              &H5
+            SystemCallCountInformation =                            &H6
+            SystemDeviceInformation =                               &H7
+            SystemProcessorPerformanceInformation =                 &H8
+            SystemFlagsInformation =                                &H9
+            SystemCallTimeInformation =                             &HA
+            SystemModuleInformation =                               &HB
+            SystemLocksInformation =                                &HC
+            SystemStackTraceInformation =                           &HD
+            SystemPagedPoolInformation =                            &HE
+            SystemNonPagedPoolInformation =                         &HF
+            SystemHandleInformation =                               &H10
+            SystemObjectInformation =                               &H11
+            SystemPageFileInformation =                             &H12
+            SystemVdmInstemulInformation =                          &H13
+            SystemVdmBopInformation =                               &H14
+            SystemFileCacheInformation =                            &H15
+            SystemPoolTagInformation =                              &H16
+            SystemInterruptInformation =                            &H17
+            SystemDpcBehaviorInformation =                          &H18
+            SystemFullMemoryInformation =                           &H19
+            SystemLoadGdiDriverInformation =                        &H1A
+            SystemUnloadGdiDriverInformation =                      &H1B
+            SystemTimeAdjustmentInformation =                       &H1C
+            SystemSummaryMemoryInformation =                        &H1D
+            SystemMirrorMemoryInformation =                         &H1E
+            SystemPerformanceTraceInformation =                     &H1F
+            SystemObsolete0 =                                       &H20
+            SystemExceptionInformation =                            &H21
+            SystemCrashDumpStateInformation =                       &H22
+            SystemKernelDebuggerInformation =                       &H23
+            SystemContextSwitchInformation =                        &H24
+            SystemRegistryQuotaInformation =                        &H25
+            SystemExtendServiceTableInformation =                   &H26
+            SystemPrioritySeperation =                              &H27
+            SystemVerifierAddDriverInformation =                    &H28
+            SystemVerifierRemoveDriverInformation =                 &H29
+            SystemProcessorIdleInformation =                        &H2A
+            SystemLegacyDriverInformation =                         &H2B
+            SystemCurrentTimeZoneInformation =                      &H2C
+            SystemLookasideInformation =                            &H2D
+            SystemTimeSlipNotification =                            &H2E
+            SystemSessionCreate =                                   &H2F
+            SystemSessionDetach =                                   &H30
+            SystemSessionInformation =                              &H31
+            SystemRangeStartInformation =                           &H32
+            SystemVerifierInformation =                             &H33
+            SystemVerifierThunkExtend =                             &H34
+            SystemSessionProcessInformation =                       &H35
+            SystemLoadGdiDriverInSystemSpace =                      &H36
+            SystemNumaProcessorMap =                                &H37
+            SystemPrefetcherInformation =                           &H38
+            SystemExtendedProcessInformation =                      &H39
+            SystemRecommendedSharedDataAlignment =                  &H3A
+            SystemComPlusPackage =                                  &H3B
+            SystemNumaAvailableMemory =                             &H3C
+            SystemProcessorPowerInformation =                       &H3D
+            SystemEmulationBasicInformation =                       &H3E
+            SystemEmulationProcessorInformation =                   &H3F
+            SystemExtendedHandleInformation =                       &H40
+            SystemLostDelayedWriteInformation =                     &H41
+            SystemBigPoolInformation =                              &H42
+            SystemSessionPoolTagInformation =                       &H43
+            SystemSessionMappedViewInformation =                    &H44
+            SystemHotpatchInformation =                             &H45
+            SystemObjectSecurityMode =                              &H46
+            SystemWatchdogTimerHandler =                            &H47
+            SystemWatchdogTimerInformation =                        &H48
+            SystemLogicalProcessorInformation =                     &H49
+            SystemWow64SharedInformationObsolete =                  &H4A
+            SystemRegisterFirmwareTableInformationHandler =         &H4B
+            SystemFirmwareTableInformation =                        &H4C
+            SystemModuleInformationEx =                             &H4D
+            SystemVerifierTriageInformation =                       &H4E
+            SystemSuperfetchInformation =                           &H4F
+            SystemMemoryListInformation =                           &H50
+            SystemFileCacheInformationEx =                          &H51
+            SystemThreadPriorityClientIdInformation =               &H52
+            SystemProcessorIdleCycleTimeInformation =               &H53
+            SystemVerifierCancellationInformation =                 &H54
+            SystemProcessorPowerInformationEx =                     &H55
+            SystemRefTraceInformation =                             &H56
+            SystemSpecialPoolInformation =                          &H57
+            SystemProcessIdInformation =                            &H58
+            SystemErrorPortInformation =                            &H59
+            SystemBootEnvironmentInformation =                      &H5A
+            SystemHypervisorInformation =                           &H5B
+            SystemVerifierInformationEx =                           &H5C
+            SystemTimeZoneInformation =                             &H5D
+            SystemImageFileExecutionOptionsInformation =            &H5E
+            SystemCoverageInformation =                             &H5F
+            SystemPrefetchPatchInformation =                        &H60
+            SystemVerifierFaultsInformation =                       &H61
+            SystemSystemPartitionInformation =                      &H62
+            SystemSystemDiskInformation =                           &H63
+            SystemProcessorPerformanceDistribution =                &H64
+            SystemNumaProximityNodeInformation =                    &H65
+            SystemDynamicTimeZoneInformation =                      &H66
+            SystemCodeIntegrityInformation =                        &H67
+            SystemProcessorMicrocodeUpdateInformation =             &H68
+            SystemProcessorBrandString =                            &H69
+            SystemVirtualAddressInformation =                       &H6A
+            SystemLogicalProcessorAndGroupInformation =             &H6B
+            SystemProcessorCycleTimeInformation =                   &H6C
+            SystemStoreInformation =                                &H6D
+            SystemRegistryAppendString =                            &H6E
+            SystemAitSamplingValue =                                &H6F
+            SystemVhdBootInformation =                              &H70
+            SystemCpuQuotaInformation =                             &H71
+            SystemNativeBasicInformation =                          &H72
+            SystemErrorPortTimeouts =                               &H73
+            SystemLowPriorityIoInformation =                        &H74
+            SystemBootEntropyInformation =                          &H75
+            SystemVerifierCountersInformation =                     &H76
+            SystemPagedPoolInformationEx =                          &H77
+            SystemSystemPtesInformationEx =                         &H78
+            SystemNodeDistanceInformation =                         &H79
+            SystemAcpiAuditInformation =                            &H7A
+            SystemBasicPerformanceInformation =                     &H7B
+            SystemQueryPerformanceCounterInformation =              &H7C
+            SystemSessionBigPoolInformation =                       &H7D
+            SystemBootGraphicsInformation =                         &H7E
+            SystemScrubPhysicalMemoryInformation =                  &H7F
+            SystemBadPageInformation =                              &H80
+            SystemProcessorProfileControlArea =                     &H81
+            SystemCombinePhysicalMemoryInformation =                &H82
+            SystemEntropyInterruptTimingInformation =               &H83
+            SystemConsoleInformation =                              &H84
+            SystemPlatformBinaryInformation =                       &H85
+            SystemPolicyInformation =                               &H86
+            SystemHypervisorProcessorCountInformation =             &H87
+            SystemDeviceDataInformation =                           &H88
+            SystemDeviceDataEnumerationInformation =                &H89
+            SystemMemoryTopologyInformation =                       &H8A
+            SystemMemoryChannelInformation =                        &H8B
+            SystemBootLogoInformation =                             &H8C
+            SystemProcessorPerformanceInformationEx =               &H8D
+            SystemCriticalProcessErrorLogInformation =              &H8E
+            SystemSecureBootPolicyInformation =                     &H8F
+            SystemPageFileInformationEx =                           &H90
+            SystemSecureBootInformation =                           &H91
+            SystemEntropyInterruptTimingRawInformation =            &H92
+            SystemPortableWorkspaceEfiLauncherInformation =         &H93
+            SystemFullProcessInformation =                          &H94
+            SystemKernelDebuggerInformationEx =                     &H95
+            SystemBootMetadataInformation =                         &H96
+            SystemSoftRebootInformation =                           &H97
+            SystemElamCertificateInformation =                      &H98
+            SystemOfflineDumpConfigInformation =                    &H99
+            SystemProcessorFeaturesInformation =                    &H9A
+            SystemRegistryReconciliationInformation =               &H9B
+            SystemEdidInformation =                                 &H9C
+            SystemManufacturingInformation =                        &H9D
+            SystemEnergyEstimationConfigInformation =               &H9E
+            SystemHypervisorDetailInformation =                     &H9F
+            SystemProcessorCycleStatsInformation =                  &HA0
+            SystemVmGenerationCountInformation =                    &HA1
+            SystemTrustedPlatformModuleInformation =                &HA2
+            SystemKernelDebuggerFlags =                             &HA3
+            SystemCodeIntegrityPolicyInformation =                  &HA4
+            SystemIsolatedUserModeInformation =                     &HA5
             SystemHardwareSecurityTestInterfaceResultsInformation = &HA6
-            SystemSingleModuleInformation = &HA7
-            SystemAllowedCpuSetsInformation = &HA8
-            SystemDmaProtectionInformation = &HA9
-            SystemInterruptCpuSetsInformation = &HAA
-            SystemSecureBootPolicyFullInformation = &HAB
-            SystemCodeIntegrityPolicyFullInformation = &HAC
-            SystemAffinitizedInterruptProcessorInformation = &HAD
-            SystemRootSiloInformation = &HAE
-            SystemCpuSetInformation = &HAF
-            SystemCpuSetTagInformation = &HB0
-            SystemWin32WerStartCallout = &HB1
-            SystemSecureKernelProfileInformation = &HB2
-            SystemCodeIntegrityPlatformManifestInformation = &HB3
-            SystemInterruptSteeringInformation = &HB4
-            SystemSuppportedProcessorArchitectures = &HB5
-            SystemMemoryUsageInformation = &HB6
-            SystemCodeIntegrityCertificateInformation = &HB7
-            SystemPhysicalMemoryInformation = &HB8
-            SystemControlFlowTransition = &HB9
-            SystemKernelDebuggingAllowed = &HBA
-            SystemActivityModerationExeState = &HBB
-            SystemActivityModerationUserSettings = &HBC
-            SystemCodeIntegrityPoliciesFullInformation = &HBD
-            SystemCodeIntegrityUnlockInformation = &HBE
-            SystemIntegrityQuotaInformation = &HBF
-            SystemFlushInformation = &HC0
-            SystemProcessorIdleMaskInformation = &HC1
-            SystemSecureDumpEncryptionInformation = &HC2
-            SystemWriteConstraintInformation = &HC3
-            SystemKernelVaShadowInformation = &HC4
-            SystemHypervisorSharedPageInformation = &HC5
-            SystemFirmwareBootPerformanceInformation = &HC6
-            SystemCodeIntegrityVerificationInformation = &HC7
-            SystemFirmwarePartitionInformation = &HC8
-            SystemSpeculationControlInformation = &HC9
-            SystemDmaGuardPolicyInformation = &HCA
-            SystemEnclaveLaunchControlInformation = &HCB
-            SystemWorkloadAllowedCpuSetsInformation = &HCC
-            SystemCodeIntegrityUnlockModeInformation = &HCD
-            SystemLeapSecondInformation = &HCE
-            SystemFlags2Information = &HCF
-            SystemSecurityModelInformation = &HD0
-            SystemCodeIntegritySyntheticCacheInformation = &HD1
-            MaxSystemInfoClass = &HD2
+            SystemSingleModuleInformation =                         &HA7
+            SystemAllowedCpuSetsInformation =                       &HA8
+            SystemDmaProtectionInformation =                        &HA9
+            SystemInterruptCpuSetsInformation =                     &HAA
+            SystemSecureBootPolicyFullInformation =                 &HAB
+            SystemCodeIntegrityPolicyFullInformation =              &HAC
+            SystemAffinitizedInterruptProcessorInformation =        &HAD
+            SystemRootSiloInformation =                             &HAE
+            SystemCpuSetInformation =                               &HAF
+            SystemCpuSetTagInformation =                            &HB0
+            SystemWin32WerStartCallout =                            &HB1
+            SystemSecureKernelProfileInformation =                  &HB2
+            SystemCodeIntegrityPlatformManifestInformation =        &HB3
+            SystemInterruptSteeringInformation =                    &HB4
+            SystemSuppportedProcessorArchitectures =                &HB5
+            SystemMemoryUsageInformation =                          &HB6
+            SystemCodeIntegrityCertificateInformation =             &HB7
+            SystemPhysicalMemoryInformation =                       &HB8
+            SystemControlFlowTransition =                           &HB9
+            SystemKernelDebuggingAllowed =                          &HBA
+            SystemActivityModerationExeState =                      &HBB
+            SystemActivityModerationUserSettings =                  &HBC
+            SystemCodeIntegrityPoliciesFullInformation =            &HBD
+            SystemCodeIntegrityUnlockInformation =                  &HBE
+            SystemIntegrityQuotaInformation =                       &HBF
+            SystemFlushInformation =                                &HC0
+            SystemProcessorIdleMaskInformation =                    &HC1
+            SystemSecureDumpEncryptionInformation =                 &HC2
+            SystemWriteConstraintInformation =                      &HC3
+            SystemKernelVaShadowInformation =                       &HC4
+            SystemHypervisorSharedPageInformation =                 &HC5
+            SystemFirmwareBootPerformanceInformation =              &HC6
+            SystemCodeIntegrityVerificationInformation =            &HC7
+            SystemFirmwarePartitionInformation =                    &HC8
+            SystemSpeculationControlInformation =                   &HC9
+            SystemDmaGuardPolicyInformation =                       &HCA
+            SystemEnclaveLaunchControlInformation =                 &HCB
+            SystemWorkloadAllowedCpuSetsInformation =               &HCC
+            SystemCodeIntegrityUnlockModeInformation =              &HCD
+            SystemLeapSecondInformation =                           &HCE
+            SystemFlags2Information =                               &HCF
+            SystemSecurityModelInformation =                        &HD0
+            SystemCodeIntegritySyntheticCacheInformation =          &HD1
+            MaxSystemInfoClass =                                    &HD2
         End Enum
 
         'https://www.pinvoke.net/default.aspx/Enums.OBJECT_INFORMATION_CLASS
         Protected Enum OBJECT_INFORMATION_CLASS
-            ObjectBasicInformation = 0
-            ObjectNameInformation = 1
-            ObjectTypeInformation = 2
+            ObjectBasicInformation =    0
+            ObjectNameInformation =     1
+            ObjectTypeInformation =     2
             ObjectAllTypesInformation = 3
-            ObjectHandleInformation = 4
+            ObjectHandleInformation =   4
         End Enum
 
         'https://docs.microsoft.com/en-za/windows/win32/procthread/process-security-and-access-rights
         'https://www.pinvoke.net/default.aspx/Enums.ProcessAccess
         Protected Enum PROCESS_ACCESS_RIGHTS
-            PROCESS_TERMINATE = &H1
-            PROCESS_CREATE_THREAD = &H2
-            PROCESS_SET_SESSION_ID = &H4
-            PROCESS_VM_OPERATION = &H8
-            PROCESS_VM_READ = &H10
-            PROCESS_VM_WRITE = &H20
-            PROCESS_DUP_HANDLE = &H40
-            PROCESS_CREATE_PROCESS = &H80
-            PROCESS_SET_QUOTA = &H100
-            PROCESS_SET_INFORMATION = &H200
-            PROCESS_QUERY_INFORMATION = &H400
-            PROCESS_SUSPEND_RESUME = &H800
-            PROCESS_QUERY_LIMITED_INFORMATION = &H1000
-            DELETE = &H10000
-            READ_CONTROL = &H20000
-            WRITE_DAC = &H40000
-            WRITE_OWNER = &H80000
-            STANDARD_RIGHTS_REQUIRED = &HF0000
-            SYNCHRONIZE = &H100000
+            PROCESS_TERMINATE =                 &H00000001
+            PROCESS_CREATE_THREAD =             &H00000002
+            PROCESS_SET_SESSION_ID =            &H00000004
+            PROCESS_VM_OPERATION =              &H00000008
+            PROCESS_VM_READ =                   &H00000010
+            PROCESS_VM_WRITE =                  &H00000020
+            PROCESS_DUP_HANDLE =                &H00000040
+            PROCESS_CREATE_PROCESS =            &H00000080
+            PROCESS_SET_QUOTA =                 &H00000100
+            PROCESS_SET_INFORMATION =           &H00000200
+            PROCESS_QUERY_INFORMATION =         &H00000400
+            PROCESS_SUSPEND_RESUME =            &H00000800
+            PROCESS_QUERY_LIMITED_INFORMATION = &H00001000
+            DELETE =                            &H00010000
+            READ_CONTROL =                      &H00020000
+            WRITE_DAC =                         &H00040000
+            WRITE_OWNER =                       &H00080000
+            STANDARD_RIGHTS_REQUIRED =          &H000F0000
+            SYNCHRONIZE =                       &H00100000
 
             PROCESS_ALL_ACCESS = STANDARD_RIGHTS_REQUIRED Or SYNCHRONIZE Or &HFFFF
         End Enum
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle#DUPLICATE_CLOSE_SOURCE
         Protected Enum DUPLICATE_HANDLE_OPTIONS
-            DUPLICATE_CLOSE_SOURCE = &H1
-            DUPLICATE_SAME_ACCESS = &H2
+            DUPLICATE_CLOSE_SOURCE = &H00000001
+            DUPLICATE_SAME_ACCESS =  &H00000002
         End Enum
 
         'http://www.jasinskionline.com/TechnicalWiki/SYSTEM_HANDLE_INFORMATION-WinApi-Struct.ashx
         Friend Enum SYSTEM_HANDLE_FLAGS As Byte
-            PROTECT_FROM_CLOSE = &H1
-            INHERIT = &H2
+            PROTECT_FROM_CLOSE = &H01
+            INHERIT =            &H02
         End Enum
 
         'https://www.winehq.org/pipermail/wine-patches/2005-October/021642.html
         'https://github.com/olimsaidov/autorun-remover/blob/b558df6487ae1cb4cb998fab3330c07bb7de0f21/NativeAPI.pas#L108
         Friend Enum SYSTEM_HANDLE_TYPE
-            UNKNOWN = 0
-            TYPE = 1
-            DIRECTORY = 2
-            SYMBOLIC_LINK = 3
-            TOKEN = 4
-            PROCESS = 5
-            THREAD = 6
-            JOB = 7
-            [EVENT] = 8
-            EVENT_PAIR = 9
-            MUTANT = 10
-            UNKNOWN_11 = 11
-            SEMAPHORE = 12
-            TIMER = 13
-            PROFILE = 14
+            UNKNOWN =        00
+            TYPE =           01
+            DIRECTORY =      02
+            SYMBOLIC_LINK =  03
+            TOKEN =          04
+            PROCESS =        05
+            THREAD =         06
+            JOB =            07
+            [EVENT] =        08
+            EVENT_PAIR =     09
+            MUTANT =         10
+            UNKNOWN_11 =     11
+            SEMAPHORE =      12
+            TIMER =          13
+            PROFILE =        14
             WINDOW_STATION = 15
-            DESKTOP = 16
-            SECTION = 17
-            KEY = 18
-            PORT = 19
-            WAITABLE_PORT = 20
-            ADAPTER = 21
-            CONTROLLER = 22
-            DEVICE = 23
-            DRIVER = 24
-            IO_COMPLETION = 25
-            FILE = 28
+            DESKTOP =        16
+            SECTION =        17
+            KEY =            18
+            PORT =           19
+            WAITABLE_PORT =  20
+            ADAPTER =        21
+            CONTROLLER =     22
+            DEVICE =         23
+            DRIVER =         24
+            IO_COMPLETION =  25
+            FILE =           28
 
             ' From my own research
             TP_WORKER_FACTORY
@@ -393,10 +393,10 @@ Namespace WalkmanLib
         'http://www.jasinskionline.com/technicalwiki/GENERIC_MAPPING-WinApi-Struct.ashx
         <StructLayout(LayoutKind.Sequential)>
         Protected Structure GENERIC_MAPPING
-            Public GenericRead As UInteger
-            Public GenericWrite As UInteger
+            Public GenericRead As    UInteger
+            Public GenericWrite As   UInteger
             Public GenericExecute As UInteger
-            Public GenericAll As UInteger
+            Public GenericAll As     UInteger
         End Structure
 
         'http://www.jasinskionline.com/technicalwiki/OBJECT_NAME_INFORMATION-WinApi-Struct.ashx
@@ -409,27 +409,27 @@ Namespace WalkmanLib
         'http://www.jasinskionline.com/technicalwiki/OBJECT_TYPE_INFORMATION-WinApi-Struct.ashx
         <StructLayout(LayoutKind.Sequential)>
         Protected Structure OBJECT_TYPE_INFORMATION
-            Public TypeName As UNICODE_STRING
-            Public ObjectCount As Integer
-            Public HandleCount As Integer
-            Private ReadOnly Reserved1 As Integer
-            Private ReadOnly Reserved2 As Integer
-            Private ReadOnly Reserved3 As Integer
-            Private ReadOnly Reserved4 As Integer
-            Public PeakObjectCount As Integer
-            Public PeakHandleCount As Integer
-            Private ReadOnly Reserved5 As Integer
-            Private ReadOnly Reserved6 As Integer
-            Private ReadOnly Reserved7 As Integer
-            Private ReadOnly Reserved8 As Integer
-            Public InvalidAttributes As Integer
-            Public GenericMapping As GENERIC_MAPPING
-            Public ValidAccess As Integer
-            Private ReadOnly Unknown As Byte
+            Public TypeName As               UNICODE_STRING
+            Public ObjectCount As            Integer
+            Public HandleCount As            Integer
+            Private ReadOnly Reserved1 As    Integer
+            Private ReadOnly Reserved2 As    Integer
+            Private ReadOnly Reserved3 As    Integer
+            Private ReadOnly Reserved4 As    Integer
+            Public PeakObjectCount As        Integer
+            Public PeakHandleCount As        Integer
+            Private ReadOnly Reserved5 As    Integer
+            Private ReadOnly Reserved6 As    Integer
+            Private ReadOnly Reserved7 As    Integer
+            Private ReadOnly Reserved8 As    Integer
+            Public InvalidAttributes As      Integer
+            Public GenericMapping As         GENERIC_MAPPING
+            Public ValidAccess As            Integer
+            Private ReadOnly Unknown As      Byte
             Public MaintainHandleDatabase As Byte
-            Public PoolType As Integer
-            Public PagedPoolUsage As Integer
-            Public NonPagedPoolUsage As Integer
+            Public PoolType As               Integer
+            Public PagedPoolUsage As         Integer
+            Public NonPagedPoolUsage As      Integer
         End Structure
 
         #End Region
