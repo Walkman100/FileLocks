@@ -3,7 +3,7 @@
 'https://stackoverflow.com/a/13735033/2999220
 'https://stackoverflow.com/a/6351168/2999220
 
-
+Imports System
 Imports System.Collections.Concurrent
 Imports System.Collections.Generic
 Imports System.ComponentModel
@@ -25,7 +25,7 @@ Namespace WalkmanLib
         Protected Enum NTSTATUS As UInteger
             STATUS_SUCCESS = &H0
             STATUS_BUFFER_OVERFLOW = &H80000005UI
-            STATUS_INFO_LENGTH_MISMATCH = &Hc0000004UI
+            STATUS_INFO_LENGTH_MISMATCH = &HC0000004UI
         End Enum
 
         'https://www.pinvoke.net/default.aspx/ntdll/SYSTEM_INFORMATION_CLASS.html
@@ -40,12 +40,12 @@ Namespace WalkmanLib
             SystemDeviceInformation = &H7
             SystemProcessorPerformanceInformation = &H8
             SystemFlagsInformation = &H9
-            SystemCallTimeInformation = &Ha
-            SystemModuleInformation = &Hb
-            SystemLocksInformation = &Hc
-            SystemStackTraceInformation = &Hd
-            SystemPagedPoolInformation = &He
-            SystemNonPagedPoolInformation = &Hf
+            SystemCallTimeInformation = &HA
+            SystemModuleInformation = &HB
+            SystemLocksInformation = &HC
+            SystemStackTraceInformation = &HD
+            SystemPagedPoolInformation = &HE
+            SystemNonPagedPoolInformation = &HF
             SystemHandleInformation = &H10
             SystemObjectInformation = &H11
             SystemPageFileInformation = &H12
@@ -56,12 +56,12 @@ Namespace WalkmanLib
             SystemInterruptInformation = &H17
             SystemDpcBehaviorInformation = &H18
             SystemFullMemoryInformation = &H19
-            SystemLoadGdiDriverInformation = &H1a
-            SystemUnloadGdiDriverInformation = &H1b
-            SystemTimeAdjustmentInformation = &H1c
-            SystemSummaryMemoryInformation = &H1d
-            SystemMirrorMemoryInformation = &H1e
-            SystemPerformanceTraceInformation = &H1f
+            SystemLoadGdiDriverInformation = &H1A
+            SystemUnloadGdiDriverInformation = &H1B
+            SystemTimeAdjustmentInformation = &H1C
+            SystemSummaryMemoryInformation = &H1D
+            SystemMirrorMemoryInformation = &H1E
+            SystemPerformanceTraceInformation = &H1F
             SystemObsolete0 = &H20
             SystemExceptionInformation = &H21
             SystemCrashDumpStateInformation = &H22
@@ -72,12 +72,12 @@ Namespace WalkmanLib
             SystemPrioritySeperation = &H27
             SystemVerifierAddDriverInformation = &H28
             SystemVerifierRemoveDriverInformation = &H29
-            SystemProcessorIdleInformation = &H2a
-            SystemLegacyDriverInformation = &H2b
-            SystemCurrentTimeZoneInformation = &H2c
-            SystemLookasideInformation = &H2d
-            SystemTimeSlipNotification = &H2e
-            SystemSessionCreate = &H2f
+            SystemProcessorIdleInformation = &H2A
+            SystemLegacyDriverInformation = &H2B
+            SystemCurrentTimeZoneInformation = &H2C
+            SystemLookasideInformation = &H2D
+            SystemTimeSlipNotification = &H2E
+            SystemSessionCreate = &H2F
             SystemSessionDetach = &H30
             SystemSessionInformation = &H31
             SystemRangeStartInformation = &H32
@@ -88,12 +88,12 @@ Namespace WalkmanLib
             SystemNumaProcessorMap = &H37
             SystemPrefetcherInformation = &H38
             SystemExtendedProcessInformation = &H39
-            SystemRecommendedSharedDataAlignment = &H3a
-            SystemComPlusPackage = &H3b
-            SystemNumaAvailableMemory = &H3c
-            SystemProcessorPowerInformation = &H3d
-            SystemEmulationBasicInformation = &H3e
-            SystemEmulationProcessorInformation = &H3f
+            SystemRecommendedSharedDataAlignment = &H3A
+            SystemComPlusPackage = &H3B
+            SystemNumaAvailableMemory = &H3C
+            SystemProcessorPowerInformation = &H3D
+            SystemEmulationBasicInformation = &H3E
+            SystemEmulationProcessorInformation = &H3F
             SystemExtendedHandleInformation = &H40
             SystemLostDelayedWriteInformation = &H41
             SystemBigPoolInformation = &H42
@@ -104,12 +104,12 @@ Namespace WalkmanLib
             SystemWatchdogTimerHandler = &H47
             SystemWatchdogTimerInformation = &H48
             SystemLogicalProcessorInformation = &H49
-            SystemWow64SharedInformationObsolete = &H4a
-            SystemRegisterFirmwareTableInformationHandler = &H4b
-            SystemFirmwareTableInformation = &H4c
-            SystemModuleInformationEx = &H4d
-            SystemVerifierTriageInformation = &H4e
-            SystemSuperfetchInformation = &H4f
+            SystemWow64SharedInformationObsolete = &H4A
+            SystemRegisterFirmwareTableInformationHandler = &H4B
+            SystemFirmwareTableInformation = &H4C
+            SystemModuleInformationEx = &H4D
+            SystemVerifierTriageInformation = &H4E
+            SystemSuperfetchInformation = &H4F
             SystemMemoryListInformation = &H50
             SystemFileCacheInformationEx = &H51
             SystemThreadPriorityClientIdInformation = &H52
@@ -120,12 +120,12 @@ Namespace WalkmanLib
             SystemSpecialPoolInformation = &H57
             SystemProcessIdInformation = &H58
             SystemErrorPortInformation = &H59
-            SystemBootEnvironmentInformation = &H5a
-            SystemHypervisorInformation = &H5b
-            SystemVerifierInformationEx = &H5c
-            SystemTimeZoneInformation = &H5d
-            SystemImageFileExecutionOptionsInformation = &H5e
-            SystemCoverageInformation = &H5f
+            SystemBootEnvironmentInformation = &H5A
+            SystemHypervisorInformation = &H5B
+            SystemVerifierInformationEx = &H5C
+            SystemTimeZoneInformation = &H5D
+            SystemImageFileExecutionOptionsInformation = &H5E
+            SystemCoverageInformation = &H5F
             SystemPrefetchPatchInformation = &H60
             SystemVerifierFaultsInformation = &H61
             SystemSystemPartitionInformation = &H62
@@ -136,12 +136,12 @@ Namespace WalkmanLib
             SystemCodeIntegrityInformation = &H67
             SystemProcessorMicrocodeUpdateInformation = &H68
             SystemProcessorBrandString = &H69
-            SystemVirtualAddressInformation = &H6a
-            SystemLogicalProcessorAndGroupInformation = &H6b
-            SystemProcessorCycleTimeInformation = &H6c
-            SystemStoreInformation = &H6d
-            SystemRegistryAppendString = &H6e
-            SystemAitSamplingValue = &H6f
+            SystemVirtualAddressInformation = &H6A
+            SystemLogicalProcessorAndGroupInformation = &H6B
+            SystemProcessorCycleTimeInformation = &H6C
+            SystemStoreInformation = &H6D
+            SystemRegistryAppendString = &H6E
+            SystemAitSamplingValue = &H6F
             SystemVhdBootInformation = &H70
             SystemCpuQuotaInformation = &H71
             SystemNativeBasicInformation = &H72
@@ -152,12 +152,12 @@ Namespace WalkmanLib
             SystemPagedPoolInformationEx = &H77
             SystemSystemPtesInformationEx = &H78
             SystemNodeDistanceInformation = &H79
-            SystemAcpiAuditInformation = &H7a
-            SystemBasicPerformanceInformation = &H7b
-            SystemQueryPerformanceCounterInformation = &H7c
-            SystemSessionBigPoolInformation = &H7d
-            SystemBootGraphicsInformation = &H7e
-            SystemScrubPhysicalMemoryInformation = &H7f
+            SystemAcpiAuditInformation = &H7A
+            SystemBasicPerformanceInformation = &H7B
+            SystemQueryPerformanceCounterInformation = &H7C
+            SystemSessionBigPoolInformation = &H7D
+            SystemBootGraphicsInformation = &H7E
+            SystemScrubPhysicalMemoryInformation = &H7F
             SystemBadPageInformation = &H80
             SystemProcessorProfileControlArea = &H81
             SystemCombinePhysicalMemoryInformation = &H82
@@ -168,12 +168,12 @@ Namespace WalkmanLib
             SystemHypervisorProcessorCountInformation = &H87
             SystemDeviceDataInformation = &H88
             SystemDeviceDataEnumerationInformation = &H89
-            SystemMemoryTopologyInformation = &H8a
-            SystemMemoryChannelInformation = &H8b
-            SystemBootLogoInformation = &H8c
-            SystemProcessorPerformanceInformationEx = &H8d
-            SystemCriticalProcessErrorLogInformation = &H8e
-            SystemSecureBootPolicyInformation = &H8f
+            SystemMemoryTopologyInformation = &H8A
+            SystemMemoryChannelInformation = &H8B
+            SystemBootLogoInformation = &H8C
+            SystemProcessorPerformanceInformationEx = &H8D
+            SystemCriticalProcessErrorLogInformation = &H8E
+            SystemSecureBootPolicyInformation = &H8F
             SystemPageFileInformationEx = &H90
             SystemSecureBootInformation = &H91
             SystemEntropyInterruptTimingRawInformation = &H92
@@ -184,63 +184,63 @@ Namespace WalkmanLib
             SystemSoftRebootInformation = &H97
             SystemElamCertificateInformation = &H98
             SystemOfflineDumpConfigInformation = &H99
-            SystemProcessorFeaturesInformation = &H9a
-            SystemRegistryReconciliationInformation = &H9b
-            SystemEdidInformation = &H9c
-            SystemManufacturingInformation = &H9d
-            SystemEnergyEstimationConfigInformation = &H9e
-            SystemHypervisorDetailInformation = &H9f
-            SystemProcessorCycleStatsInformation = &Ha0
-            SystemVmGenerationCountInformation = &Ha1
-            SystemTrustedPlatformModuleInformation = &Ha2
-            SystemKernelDebuggerFlags = &Ha3
-            SystemCodeIntegrityPolicyInformation = &Ha4
-            SystemIsolatedUserModeInformation = &Ha5
-            SystemHardwareSecurityTestInterfaceResultsInformation = &Ha6
-            SystemSingleModuleInformation = &Ha7
-            SystemAllowedCpuSetsInformation = &Ha8
-            SystemDmaProtectionInformation = &Ha9
-            SystemInterruptCpuSetsInformation = &Haa
-            SystemSecureBootPolicyFullInformation = &Hab
-            SystemCodeIntegrityPolicyFullInformation = &Hac
-            SystemAffinitizedInterruptProcessorInformation = &Had
-            SystemRootSiloInformation = &Hae
-            SystemCpuSetInformation = &Haf
-            SystemCpuSetTagInformation = &Hb0
-            SystemWin32WerStartCallout = &Hb1
-            SystemSecureKernelProfileInformation = &Hb2
-            SystemCodeIntegrityPlatformManifestInformation = &Hb3
-            SystemInterruptSteeringInformation = &Hb4
-            SystemSuppportedProcessorArchitectures = &Hb5
-            SystemMemoryUsageInformation = &Hb6
-            SystemCodeIntegrityCertificateInformation = &Hb7
-            SystemPhysicalMemoryInformation = &Hb8
-            SystemControlFlowTransition = &Hb9
-            SystemKernelDebuggingAllowed = &Hba
-            SystemActivityModerationExeState = &Hbb
-            SystemActivityModerationUserSettings = &Hbc
-            SystemCodeIntegrityPoliciesFullInformation = &Hbd
-            SystemCodeIntegrityUnlockInformation = &Hbe
-            SystemIntegrityQuotaInformation = &Hbf
-            SystemFlushInformation = &Hc0
-            SystemProcessorIdleMaskInformation = &Hc1
-            SystemSecureDumpEncryptionInformation = &Hc2
-            SystemWriteConstraintInformation = &Hc3
-            SystemKernelVaShadowInformation = &Hc4
-            SystemHypervisorSharedPageInformation = &Hc5
-            SystemFirmwareBootPerformanceInformation = &Hc6
-            SystemCodeIntegrityVerificationInformation = &Hc7
-            SystemFirmwarePartitionInformation = &Hc8
-            SystemSpeculationControlInformation = &Hc9
-            SystemDmaGuardPolicyInformation = &Hca
-            SystemEnclaveLaunchControlInformation = &Hcb
-            SystemWorkloadAllowedCpuSetsInformation = &Hcc
-            SystemCodeIntegrityUnlockModeInformation = &Hcd
-            SystemLeapSecondInformation = &Hce
-            SystemFlags2Information = &Hcf
-            SystemSecurityModelInformation = &Hd0
-            SystemCodeIntegritySyntheticCacheInformation = &Hd1
-            MaxSystemInfoClass = &Hd2
+            SystemProcessorFeaturesInformation = &H9A
+            SystemRegistryReconciliationInformation = &H9B
+            SystemEdidInformation = &H9C
+            SystemManufacturingInformation = &H9D
+            SystemEnergyEstimationConfigInformation = &H9E
+            SystemHypervisorDetailInformation = &H9F
+            SystemProcessorCycleStatsInformation = &HA0
+            SystemVmGenerationCountInformation = &HA1
+            SystemTrustedPlatformModuleInformation = &HA2
+            SystemKernelDebuggerFlags = &HA3
+            SystemCodeIntegrityPolicyInformation = &HA4
+            SystemIsolatedUserModeInformation = &HA5
+            SystemHardwareSecurityTestInterfaceResultsInformation = &HA6
+            SystemSingleModuleInformation = &HA7
+            SystemAllowedCpuSetsInformation = &HA8
+            SystemDmaProtectionInformation = &HA9
+            SystemInterruptCpuSetsInformation = &HAA
+            SystemSecureBootPolicyFullInformation = &HAB
+            SystemCodeIntegrityPolicyFullInformation = &HAC
+            SystemAffinitizedInterruptProcessorInformation = &HAD
+            SystemRootSiloInformation = &HAE
+            SystemCpuSetInformation = &HAF
+            SystemCpuSetTagInformation = &HB0
+            SystemWin32WerStartCallout = &HB1
+            SystemSecureKernelProfileInformation = &HB2
+            SystemCodeIntegrityPlatformManifestInformation = &HB3
+            SystemInterruptSteeringInformation = &HB4
+            SystemSuppportedProcessorArchitectures = &HB5
+            SystemMemoryUsageInformation = &HB6
+            SystemCodeIntegrityCertificateInformation = &HB7
+            SystemPhysicalMemoryInformation = &HB8
+            SystemControlFlowTransition = &HB9
+            SystemKernelDebuggingAllowed = &HBA
+            SystemActivityModerationExeState = &HBB
+            SystemActivityModerationUserSettings = &HBC
+            SystemCodeIntegrityPoliciesFullInformation = &HBD
+            SystemCodeIntegrityUnlockInformation = &HBE
+            SystemIntegrityQuotaInformation = &HBF
+            SystemFlushInformation = &HC0
+            SystemProcessorIdleMaskInformation = &HC1
+            SystemSecureDumpEncryptionInformation = &HC2
+            SystemWriteConstraintInformation = &HC3
+            SystemKernelVaShadowInformation = &HC4
+            SystemHypervisorSharedPageInformation = &HC5
+            SystemFirmwareBootPerformanceInformation = &HC6
+            SystemCodeIntegrityVerificationInformation = &HC7
+            SystemFirmwarePartitionInformation = &HC8
+            SystemSpeculationControlInformation = &HC9
+            SystemDmaGuardPolicyInformation = &HCA
+            SystemEnclaveLaunchControlInformation = &HCB
+            SystemWorkloadAllowedCpuSetsInformation = &HCC
+            SystemCodeIntegrityUnlockModeInformation = &HCD
+            SystemLeapSecondInformation = &HCE
+            SystemFlags2Information = &HCF
+            SystemSecurityModelInformation = &HD0
+            SystemCodeIntegritySyntheticCacheInformation = &HD1
+            MaxSystemInfoClass = &HD2
         End Enum
 
         'https://www.pinvoke.net/default.aspx/Enums.OBJECT_INFORMATION_CLASS
@@ -272,7 +272,7 @@ Namespace WalkmanLib
             READ_CONTROL = &H20000
             WRITE_DAC = &H40000
             WRITE_OWNER = &H80000
-            STANDARD_RIGHTS_REQUIRED = &Hf0000
+            STANDARD_RIGHTS_REQUIRED = &HF0000
             SYNCHRONIZE = &H100000
 
             PROCESS_ALL_ACCESS = STANDARD_RIGHTS_REQUIRED Or SYNCHRONIZE Or &HFFFF
@@ -368,18 +368,18 @@ Namespace WalkmanLib
             ''' <summary>Handle Value</summary>
             Public wValue As UShort
             ''' <summary>Object Pointer</summary>
-            Private pAddress As IntPtr
+            Private ReadOnly pAddress As IntPtr
             ''' <summary>Access Mask</summary>
             Public dwGrantedAccess As UInteger
         End Structure
 
         'https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string
         'https://www.pinvoke.net/default.aspx/Structures/UNICODE_STRING.html
-        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)>
+        <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Unicode)>
         Protected Structure UNICODE_STRING
             Public ReadOnly Length As UShort
             Public ReadOnly MaximumLength As UShort
-            <MarshalAs(UnmanagedType.LPWStr)> _
+            <MarshalAs(UnmanagedType.LPWStr)>
             Public ReadOnly Buffer As String
 
             Public Sub New(s As String)
@@ -412,20 +412,20 @@ Namespace WalkmanLib
             Public TypeName As UNICODE_STRING
             Public ObjectCount As Integer
             Public HandleCount As Integer
-            Private Reserved1 As Integer
-            Private Reserved2 As Integer
-            Private Reserved3 As Integer
-            Private Reserved4 As Integer
+            Private ReadOnly Reserved1 As Integer
+            Private ReadOnly Reserved2 As Integer
+            Private ReadOnly Reserved3 As Integer
+            Private ReadOnly Reserved4 As Integer
             Public PeakObjectCount As Integer
             Public PeakHandleCount As Integer
-            Private Reserved5 As Integer
-            Private Reserved6 As Integer
-            Private Reserved7 As Integer
-            Private Reserved8 As Integer
+            Private ReadOnly Reserved5 As Integer
+            Private ReadOnly Reserved6 As Integer
+            Private ReadOnly Reserved7 As Integer
+            Private ReadOnly Reserved8 As Integer
             Public InvalidAttributes As Integer
             Public GenericMapping As GENERIC_MAPPING
             Public ValidAccess As Integer
-            Private Unknown As Byte
+            Private ReadOnly Unknown As Byte
             Public MaintainHandleDatabase As Byte
             Public PoolType As Integer
             Public PagedPoolUsage As Integer
@@ -458,7 +458,7 @@ Namespace WalkmanLib
         End Function
 
         'https://docs.microsoft.com/en-za/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
-        <DllImport("kernel32.dll", SetLastError := True)>
+        <DllImport("kernel32.dll", SetLastError:=True)>
         Protected Shared Function OpenProcess(
             <[In]> dwDesiredAccess As PROCESS_ACCESS_RIGHTS,
             <[In], MarshalAs(UnmanagedType.Bool)> bInheritHandle As Boolean,
@@ -467,7 +467,7 @@ Namespace WalkmanLib
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-duplicatehandle
-        <DllImport("kernel32.dll", SetLastError := True)>
+        <DllImport("kernel32.dll", SetLastError:=True)>
         Protected Shared Function DuplicateHandle(
             <[In]> hSourceProcessHandle As IntPtr,
             <[In]> hSourceHandle As IntPtr,
@@ -486,7 +486,7 @@ Namespace WalkmanLib
 
         'https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
         <ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)>
-        <DllImport("kernel32.dll", SetLastError := True)>
+        <DllImport("kernel32.dll", SetLastError:=True)>
         Protected Shared Function CloseHandle(
             <[In]> hObject As IntPtr
                 ) As <MarshalAs(UnmanagedType.Bool)> Boolean
@@ -494,7 +494,7 @@ Namespace WalkmanLib
 
         'https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-querydosdevicea
         'https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-querydosdevicew
-        <DllImport("kernel32.dll", SetLastError := True)>
+        <DllImport("kernel32.dll", SetLastError:=True)>
         Protected Shared Function QueryDosDevice(
             <[In]> lpDeviceName As String,
             <Out>  lpTargetPath As StringBuilder,
@@ -704,18 +704,18 @@ Namespace WalkmanLib
                 '     only check onlyGetNameFor if it isn't UNKNOWN
                 '         this type can hang for ~15 mins, but excluding it cuts a lot of results, and it does eventually resolve...
                 '        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120089 AndAlso handleInfo.Flags = &H00                       ) AndAlso
-                If (handleInfo.TypeString IsNot Nothing AndAlso
+                If handleInfo.TypeString IsNot Nothing AndAlso
                     (onlyGetNameFor = SYSTEM_HANDLE_TYPE.UNKNOWN OrElse handleInfo.Type = onlyGetNameFor) AndAlso
                     (getAllNames = True OrElse (
-                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1f01ff AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1F01FF AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
                         Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120089 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
                         Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = &H00                       ) AndAlso
                         Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H120189 AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
-                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = &H00                       ) AndAlso
-                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
-                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = &H00                       ) AndAlso
-                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1a019f AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT)
-                            ))) Then ' don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019F AndAlso handleInfo.Flags = &H00                       ) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H12019F AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1A019F AndAlso handleInfo.Flags = &H00                       ) AndAlso
+                        Not (handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.GrantedAccess = &H1A019F AndAlso handleInfo.Flags = SYSTEM_HANDLE_FLAGS.INHERIT)
+                            )) Then ' don't query some objects that get stuck (NtQueryObject hangs on NamedPipes)
                     Dim length As UInteger
                     NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, length)
 
@@ -861,7 +861,7 @@ Namespace WalkmanLib
             End If
 
             For Each systemHandle As SYSTEM_HANDLE In GetSystemHandles()
-                Dim handleInfo As HandleInfo = GetHandleInfo(systemHandle, onlyGetNameFor := SYSTEM_HANDLE_TYPE.FILE)
+                Dim handleInfo As HandleInfo = GetHandleInfo(systemHandle, onlyGetNameFor:=SYSTEM_HANDLE_TYPE.FILE)
                 If handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.Name IsNot Nothing Then
                     handleInfo.Name = ConvertDevicePathToDosPath(handleInfo.Name)
                     If handleInfo.Name.Contains(filePath) Then
@@ -884,7 +884,7 @@ Namespace WalkmanLib
                 Try
                     Dim processToAdd As Process = Process.GetProcessById(CType(handleInfo.ProcessID, Integer))
                     processes.Add(processToAdd)
-                Catch generatedExceptionName As ArgumentException
+                Catch ex As ArgumentException
                     ' process has exited
                 End Try
             Next

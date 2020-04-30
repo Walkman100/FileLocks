@@ -6,27 +6,27 @@
 'https://docs.microsoft.com/en-us/archive/msdn-magazine/2007/april/net-matters-restart-manager-and-generic-method-compilation
 'https://devblogs.microsoft.com/oldnewthing/?p=8283
 
-
+Imports System
 Imports System.Collections.Generic
-Imports System.Runtime.InteropServices
-Imports System.Diagnostics
 Imports System.ComponentModel
+Imports System.Diagnostics
+Imports System.Runtime.InteropServices
 
 Namespace WalkmanLib
     Public NotInheritable Class RestartManager
-        Const CCH_RM_MAX_APP_NAME As Integer = 255
-        Const CCH_RM_MAX_SVC_NAME As Integer = 63
-        Const ERROR_MORE_DATA As Integer = 234
+        Private Const CCH_RM_MAX_APP_NAME As Integer = 255
+        Private Const CCH_RM_MAX_SVC_NAME As Integer = 63
+        Private Const ERROR_MORE_DATA As Integer = 234
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/ns-restartmanager-rm_process_info
-        <StructLayout(LayoutKind.Sequential, CharSet := CharSet.Unicode)>
+        <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Unicode)>
         Public Structure ProcessInfo
             Public Process As UniqueProcess
 
-            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_APP_NAME + 1)>
+            <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=CCH_RM_MAX_APP_NAME + 1)>
             Public AppName As String
 
-            <MarshalAs(UnmanagedType.ByValTStr, SizeConst := CCH_RM_MAX_SVC_NAME + 1)>
+            <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=CCH_RM_MAX_SVC_NAME + 1)>
             Public ServiceShortName As String
 
             Public ApplicationType As AppType
@@ -56,7 +56,7 @@ Namespace WalkmanLib
         End Enum
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmregisterresources
-        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Unicode)>
+        <DllImport("rstrtmgr.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
         Private Shared Function RmRegisterResources(pSessionHandle As UInteger,
                                                     nFiles As UInteger,
                                                     rgsFilenames As String(),
@@ -68,7 +68,7 @@ Namespace WalkmanLib
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmstartsession
-        <DllImport("rstrtmgr.dll", SetLastError := True, CharSet := CharSet.Auto)>
+        <DllImport("rstrtmgr.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
         Private Shared Function RmStartSession(ByRef pSessionHandle As UInteger,
                                                dwSessionFlags As Integer,
                                                strSessionKey As String
@@ -76,12 +76,12 @@ Namespace WalkmanLib
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmendsession
-        <DllImport("rstrtmgr.dll", SetLastError := True)>
+        <DllImport("rstrtmgr.dll", SetLastError:=True)>
         Private Shared Function RmEndSession(pSessionHandle As UInteger) As Integer
         End Function
 
         'https://docs.microsoft.com/en-us/windows/win32/api/restartmanager/nf-restartmanager-rmgetlist
-        <DllImport("rstrtmgr.dll", SetLastError := True)>
+        <DllImport("rstrtmgr.dll", SetLastError:=True)>
         Private Shared Function RmGetList(dwSessionHandle As UInteger,
                                           ByRef pnProcInfoNeeded As UInteger,
                                           ByRef pnProcInfo As UInteger,
