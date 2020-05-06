@@ -552,13 +552,13 @@ namespace WalkmanLib
                     }
                 }
 
-                int handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : (int)Marshal.ReadInt64(ptr);
-                int offset = IntPtr.Size;
-                int size = Marshal.SizeOf(typeof(SYSTEM_HANDLE));
+                long handleCount = IntPtr.Size == 4 ? Marshal.ReadInt32(ptr) : Marshal.ReadInt64(ptr);
+                long offset = IntPtr.Size;
+                long size = Marshal.SizeOf(typeof(SYSTEM_HANDLE));
 
-                for (int i = 0; i < handleCount; i++)
+                for (long i = 0; i < handleCount; i++)
                 {
-                    SYSTEM_HANDLE struc = Marshal.PtrToStructure<SYSTEM_HANDLE>((IntPtr)((int)ptr + offset));
+                    SYSTEM_HANDLE struc = Marshal.PtrToStructure<SYSTEM_HANDLE>((IntPtr)((long)ptr + offset));
                     yield return struc;
 
                     offset += size;
