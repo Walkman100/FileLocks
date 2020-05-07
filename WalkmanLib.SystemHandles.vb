@@ -533,13 +533,13 @@ Namespace WalkmanLib
                     End Select
                 End While
 
-                Dim handleCount As Integer = If(IntPtr.Size = 4, Marshal.ReadInt32(ptr), CType(Marshal.ReadInt64(ptr), Integer))
-                Dim offset As Integer = IntPtr.Size
-                Dim size As Integer = Marshal.SizeOf(GetType(SYSTEM_HANDLE))
+                Dim handleCount As Long = If(IntPtr.Size = 4, Marshal.ReadInt32(ptr), Marshal.ReadInt64(ptr))
+                Dim offset As Long = IntPtr.Size
+                Dim size As Long = Marshal.SizeOf(GetType(SYSTEM_HANDLE))
 
-                For i As Integer = 0 To handleCount - 1
+                For i As Long = 0 To handleCount - 1
                     Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(ptr + offset)
-                    ' `ptr + offset` above was: `CType(CType(ptr, Integer) + offset, IntPtr)` but it seems to work...
+                    ' `ptr + offset` above was: `CType(CType(ptr, Long) + offset, IntPtr)` but it seems to work...
                     Yield struc
 
                     offset += size
