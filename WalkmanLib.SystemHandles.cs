@@ -902,7 +902,7 @@ namespace WalkmanLib
             foreach (SYSTEM_HANDLE systemHandle in GetSystemHandles())
             {
                 HandleInfo handleInfo = GetHandleInfo(systemHandle, onlyGetNameFor: SYSTEM_HANDLE_TYPE.FILE);
-                if (handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && handleInfo.Name != null)
+                if (handleInfo.Type == SYSTEM_HANDLE_TYPE.FILE && !String.IsNullOrEmpty(handleInfo.Name))
                 {
                     handleInfo.Name = ConvertDevicePathToDosPath(handleInfo.Name);
                     if (handleInfo.Name.Contains(filePath))
