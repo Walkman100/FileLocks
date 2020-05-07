@@ -538,8 +538,7 @@ Namespace WalkmanLib
                 Dim size As Long = Marshal.SizeOf(GetType(SYSTEM_HANDLE))
 
                 For i As Long = 0 To handleCount - 1
-                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(ptr + offset)
-                    ' `ptr + offset` above was: `CType(CType(ptr, Long) + offset, IntPtr)` but it seems to work...
+                    Dim struc As SYSTEM_HANDLE = Marshal.PtrToStructure(Of SYSTEM_HANDLE)(CType(CType(ptr, Long) + offset, IntPtr))
                     Yield struc
 
                     offset += size
