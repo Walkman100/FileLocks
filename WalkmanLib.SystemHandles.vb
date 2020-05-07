@@ -862,7 +862,7 @@ Namespace WalkmanLib
 
             For Each systemHandle As SYSTEM_HANDLE In GetSystemHandles()
                 Dim handleInfo As HandleInfo = GetHandleInfo(systemHandle, onlyGetNameFor:=SYSTEM_HANDLE_TYPE.FILE)
-                If handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso handleInfo.Name IsNot Nothing Then
+                If handleInfo.Type = SYSTEM_HANDLE_TYPE.FILE AndAlso Not String.IsNullOrEmpty(handleInfo.Name) Then
                     handleInfo.Name = ConvertDevicePathToDosPath(handleInfo.Name)
                     If handleInfo.Name.Contains(filePath) Then
                         Yield handleInfo
